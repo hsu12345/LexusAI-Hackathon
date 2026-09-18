@@ -1,0 +1,222 @@
+[
+  {
+    "id": "ptt_001",
+    "source": "PTT",
+    "board": "car",
+    "title": "[心得] RX 原廠定保報價嚇死人",
+    "content": "RX350 開了三年，這次回原廠做定期保養，報價快兩萬，機油工時零件加起來真的貴。朋友介紹的獨立保修廠說同規格只要一半價格，而且用的也是全合成。開始在猶豫要不要繼續待在原廠體系，保證快到期了好像也沒差？",
+    "author_meta": {"tenure_hint": "3年車主", "model_hint": "RX"},
+    "posted_at": "2025-11-12T10:22:00",
+    "url": "https://www.ptt.cc/bbs/car/example001.html",
+    "engagement": {"likes": 48, "comments": 63}
+  },
+  {
+    "id": "ptt_002",
+    "source": "PTT",
+    "board": "car",
+    "title": "[問題] NX 電瓶掛掉原廠要換很貴？",
+    "content": "NX200 早上發動不了，道路救援來接電。原廠說電瓶老化建議更換，報價比外面認證電瓶貴一截。有人說外面換會影響保證嗎？車還在保證期內有點怕。",
+    "author_meta": {"tenure_hint": "保證期內", "model_hint": "NX"},
+    "posted_at": "2025-10-03T08:15:00",
+    "url": "https://www.ptt.cc/bbs/car/example002.html",
+    "engagement": {"likes": 22, "comments": 41}
+  },
+  {
+    "id": "dcard_001",
+    "source": "Dcard",
+    "board": "汽車",
+    "title": "Lexus 服務態度很好但等太久",
+    "content": "ES 回廠保養，專員超有禮貌環境也好，可是沒預約就去真的等很久。有開代步車但還是花掉半天。之後會記得用 App 預約，不然真的不方便。整體服務體驗還可以，但時間成本偏高。",
+    "author_meta": {"tenure_hint": "2年車主", "model_hint": "ES"},
+    "posted_at": "2025-09-18T19:40:00",
+    "url": "https://www.dcard.tw/f/car/example001",
+    "engagement": {"likes": 156, "comments": 38}
+  },
+  {
+    "id": "m01_001",
+    "source": "Mobile01",
+    "board": "汽車",
+    "title": "UX 保固外維修轉向工作室心得",
+    "content": "UX250h 保固剛過，變速箱相關檢查原廠報價太高，後來去找油車專門工作室。師傅很仔細還會解說，價格差很多。之後小保養可能都在外廠做了，大修再回原廠看看。原廠零件貴是最大原因。",
+    "author_meta": {"tenure_hint": "保固剛過", "model_hint": "UX"},
+    "posted_at": "2026-01-05T14:02:00",
+    "url": "https://www.mobile01.com/example001",
+    "engagement": {"likes": 89, "comments": 112}
+  },
+  {
+    "id": "ptt_003",
+    "source": "PTT",
+    "board": "car",
+    "title": "[情報] 準時定保可延長保證真的有嗎",
+    "content": "聽說連續準時八次定保可以用原廠機油套餐換延長保證，有人成功申請過嗎？我前面有兩次去外面換機油，不知道還算不算。如果真的有，那原廠定保貴一點好像值得。",
+    "author_meta": {"tenure_hint": "3-4年車主", "model_hint": "IS"},
+    "posted_at": "2025-12-01T21:10:00",
+    "url": "https://www.ptt.cc/bbs/car/example003.html",
+    "engagement": {"likes": 67, "comments": 55}
+  },
+  {
+    "id": "dcard_002",
+    "source": "Dcard",
+    "board": "汽車",
+    "title": "和泰 Points 回饋有感嗎？",
+    "content": "每次回廠都有 Points，但累積速度慢，折抵保養好像也沒抵多少。Elite Rewards 要保險加定保才升等，門檻感覺高。有人覺得這些回饋真的留得住車主嗎？我朋友直接外廠+產險便宜很多。",
+    "author_meta": {"tenure_hint": "4年車主", "model_hint": "RX"},
+    "posted_at": "2025-08-22T11:33:00",
+    "url": "https://www.dcard.tw/f/car/example002",
+    "engagement": {"likes": 203, "comments": 77}
+  },
+  {
+    "id": "m01_002",
+    "source": "Mobile01",
+    "board": "汽車",
+    "title": "原廠診斷電腦 vs 外廠 OBD 差異",
+    "content": "儀表亮故障燈，外廠用通用電腦讀碼說沒大問題，回原廠用專用診斷才找到模組異常。雖然貴但至少抓得到。開始理解為什麼有人願意付原廠價格，尤其是電子系統多的車。",
+    "author_meta": {"tenure_hint": "5年車主", "model_hint": "LM"},
+    "posted_at": "2025-07-14T16:45:00",
+    "url": "https://www.mobile01.com/example002",
+    "engagement": {"likes": 134, "comments": 90}
+  },
+  {
+    "id": "ptt_004",
+    "source": "PTT",
+    "board": "car",
+    "title": "[抱怨] 零件等料一週代步車還要抽籤？",
+    "content": "钣金不用講，這次零件缺料要等，聽說維修超過72小時才有免費代步，但現場說要看調度。整段溝通讓人很不爽，豪華品牌不該這樣。下次小事情真的考慮外面處理。",
+    "author_meta": {"tenure_hint": "1年車主", "model_hint": "NX"},
+    "posted_at": "2026-02-09T09:20:00",
+    "url": "https://www.ptt.cc/bbs/car/example004.html",
+    "engagement": {"likes": 311, "comments": 148}
+  },
+  {
+    "id": "dcard_003",
+    "source": "Dcard",
+    "board": "汽車",
+    "title": "取送車服務超方便分享",
+    "content": "第一次用取送車，專員到公司收車，晚上送回來還洗好。單程10公里內剛好我住得近。這種服務體驗才是買 Lexus 的理由，比單純比價有感多了。大力推薦有預約需求的人試試。",
+    "author_meta": {"tenure_hint": "新車主", "model_hint": "ES"},
+    "posted_at": "2025-06-30T20:05:00",
+    "url": "https://www.dcard.tw/f/car/example003",
+    "engagement": {"likes": 420, "comments": 52}
+  },
+  {
+    "id": "m01_003",
+    "source": "Mobile01",
+    "board": "汽車",
+    "title": "HEV 電池保證到八年有人用過嗎",
+    "content": "NX 油電開到第六年，最近電耗感覺變差。查了手冊說 HEV 電池有到八年或十六萬。如果在保證內原廠會怎麼判斷要不要換？外廠說電池很貴勸我先觀察，但又不想拖到保證外。",
+    "author_meta": {"tenure_hint": "6年車主", "model_hint": "NX"},
+    "posted_at": "2026-03-11T13:28:00",
+    "url": "https://www.mobile01.com/example003",
+    "engagement": {"likes": 76, "comments": 64}
+  },
+  {
+    "id": "ptt_005",
+    "source": "PTT",
+    "board": "car",
+    "title": "[討論] 為什麼大家說 Lexus 保值但售後貴",
+    "content": "二手行情確實穩，可是持有期間保養維修成本被罵很常見。有人算過五年 TCO，原廠路線跟外廠路線差一輛輕型機車的錢。想問有沒有折衷？例如定保回原廠、耗材去外面？會不會留下維修紀錄問題？",
+    "author_meta": {"tenure_hint": "潛在買家/車主", "model_hint": "汎用"},
+    "posted_at": "2025-11-28T22:50:00",
+    "url": "https://www.ptt.cc/bbs/car/example005.html",
+    "engagement": {"likes": 188, "comments": 201}
+  },
+  {
+    "id": "dcard_004",
+    "source": "Dcard",
+    "board": "汽車",
+    "title": "服務專員換人後體驗變差",
+    "content": "以前那個專員都會主動提醒保養跟保險，換人之後感覺就是制式推銷延長保證。不是說產品不好，但溝通方式讓人想遠離。豪華品牌最重要的其實是被理解的感覺。",
+    "author_meta": {"tenure_hint": "5年車主", "model_hint": "GS"},
+    "posted_at": "2026-01-19T18:12:00",
+    "url": "https://www.dcard.tw/f/car/example004",
+    "engagement": {"likes": 95, "comments": 44}
+  },
+  {
+    "id": "m01_004",
+    "source": "Mobile01",
+    "board": "汽車",
+    "title": "轮胎與定位外廠便宜很多",
+    "content": "原廠說要四輪定位加輪胎，報價直接讓我默默關掉對話框。去連鎖輪胎館做完一切正常。這類耗材之後大概不會回原廠了，除非要維持什麼延長保證條件。",
+    "author_meta": {"tenure_hint": "保固末期", "model_hint": "RX"},
+    "posted_at": "2025-10-25T12:00:00",
+    "url": "https://www.mobile01.com/example004",
+    "engagement": {"likes": 58, "comments": 73}
+  },
+  {
+    "id": "ptt_006",
+    "source": "PTT",
+    "board": "car",
+    "title": "[心得] 道路救援蠻準時的",
+    "content": "電瓶沒電打 0800，大概四十分鐘內到，態度專業。後來回原廠檢查順便問長期停放要注意什麼。這次對品牌加分，至少關鍵時刻有被接住。",
+    "author_meta": {"tenure_hint": "低頻用車", "model_hint": "UX"},
+    "posted_at": "2025-05-16T07:55:00",
+    "url": "https://www.ptt.cc/bbs/car/example006.html",
+    "engagement": {"likes": 40, "comments": 19}
+  },
+  {
+    "id": "dcard_005",
+    "source": "Dcard",
+    "board": "汽車",
+    "title": "延長保證要買嗎？25,900起",
+    "content": "業務一直推延長到五年或十四萬，價格 25900 起。我在網路上看到兩派：一派說電子零件貴值得買，一派說很少用到。有沒有實際理賠過的人分享？怕買開心用不到。",
+    "author_meta": {"tenure_hint": "新車/即將到期", "model_hint": "ES"},
+    "posted_at": "2026-04-02T15:40:00",
+    "url": "https://www.dcard.tw/f/car/example005",
+    "engagement": {"likes": 172, "comments": 98}
+  },
+  {
+    "id": "m01_005",
+    "source": "Mobile01",
+    "board": "汽車",
+    "title": "LINE 預約很順但提醒文案太業務",
+    "content": "用 LINE 預約保養很方便，可是後續推播都在推精品跟聯名活動，比較少針對我的車況或保修權益說明。如果能告訴我距離延長保證還差幾次定保，我會更想回原廠。",
+    "author_meta": {"tenure_hint": "數位活躍車主", "model_hint": "NX"},
+    "posted_at": "2026-02-21T09:08:00",
+    "url": "https://www.mobile01.com/example005",
+    "engagement": {"likes": 66, "comments": 31}
+  },
+  {
+    "id": "ptt_007",
+    "source": "PTT",
+    "board": "car",
+    "title": "[負面] 原廠說正常但異音還在",
+    "content": "底盤異音回廠兩次都說正常現象，參考車主手冊那些說明。可是我每天聽很煩。第三次想去外面底盤廠，被朋友勸說先要求原廠路試紀錄。信任感下降中。",
+    "author_meta": {"tenure_hint": "2年車主", "model_hint": "RX"},
+    "posted_at": "2025-12-18T17:30:00",
+    "url": "https://www.ptt.cc/bbs/car/example007.html",
+    "engagement": {"likes": 142, "comments": 87}
+  },
+  {
+    "id": "dcard_006",
+    "source": "Dcard",
+    "board": "汽車",
+    "title": "女生一個人回廠的安全感",
+    "content": "一個人開車回廠，服務廠環境乾淨，休息區舒適，說明報價也很透明，不會硬推。這種安全感是外廠給不了的。價格高一點我可以接受，因為省心。",
+    "author_meta": {"tenure_hint": "3年車主", "model_hint": "UX"},
+    "posted_at": "2025-09-02T14:22:00",
+    "url": "https://www.dcard.tw/f/car/example006",
+    "engagement": {"likes": 510, "comments": 64}
+  },
+  {
+    "id": "m01_006",
+    "source": "Mobile01",
+    "board": "汽車",
+    "title": "保固過後完全外廠的車主招手",
+    "content": "集結文：保固外還留在原廠的人理由是什麼？我已經全面外廠兩年，目前沒大問題，費用少很多。唯一擔心是將來賣車維修紀錄不連貫，不知道對中古車商談價有沒有差。",
+    "author_meta": {"tenure_hint": "保固外", "model_hint": "IS"},
+    "posted_at": "2026-05-08T11:11:00",
+    "url": "https://www.mobile01.com/example006",
+    "engagement": {"likes": 230, "comments": 176}
+  },
+  {
+    "id": "ptt_008",
+    "source": "PTT",
+    "board": "car",
+    "title": "[分享] 滿月檢查客製化設定有感",
+    "content": "新車滿月檢查順便調迎賓燈跟解鎖設定，專員很細心。這種小地方才叫豪華。希望之後定保也能維持這種溫度，而不是只看業績。",
+    "author_meta": {"tenure_hint": "新車主", "model_hint": "LBX"},
+    "posted_at": "2026-06-01T16:00:00",
+    "url": "https://www.ptt.cc/bbs/car/example008.html",
+    "engagement": {"likes": 88, "comments": 27}
+  }
+]

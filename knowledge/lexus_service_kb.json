@@ -1,0 +1,81 @@
+{
+  "brand": "LEXUS",
+  "source": "車主權益手冊 / 售後服務總覽",
+  "core_value_proposition": [
+    "以客為尊的尊榮服務體驗",
+    "原廠品質與正廠零件保證",
+    "準時定保延長保證激勵機制",
+    "Elite Rewards 車主尊榮回饋",
+    "24H 尊榮道路救援與取送車服務"
+  ],
+  "warranty": {
+    "basic": {
+      "period": "交車日起 4 年或 12 萬公里（以先到者為準）",
+      "coverage": "正常使用下因材質或製造瑕疵導致之零件毀損或故障，提供免費維修"
+    },
+    "hev_phev_battery": {
+      "period": "交車日起 8 年或 16 萬公里（以先到者為準）",
+      "note": "2019 年式起車輛；原廠 5 年/10 萬 + 和泰追加 3 年/6 萬"
+    },
+    "parts_after_service": {
+      "period": "自費於 Lexus 服務廠更換之正廠零件（消耗性除外）享 2 年或 5 萬公里保證"
+    },
+    "extended_purchase": {
+      "option": "延長至 5 年或 14 萬公里加購方案",
+      "price_from": "25,900 元起"
+    },
+    "on_time_maintenance_bonus": "保證到期前連續準時 8 次定保（原廠機油及定保套餐）可享延長保證",
+    "exclusions": [
+      "消耗性零件（皮帶、雨刷片、煞車來令片、濾芯、油料等）",
+      "例行性保養工資（積碳清除、前後輪定位等）",
+      "自備不符合規範油品或未依保養週期實施",
+      "外力、改裝、非正廠零件造成之損壞"
+    ]
+  },
+  "maintenance": {
+    "new_car_month_check": "交車後 30 天內免費滿月檢查與客製化設定",
+    "first_half_year": "交車後半年或 1 萬公里內，保養檢查工資免費",
+    "regular": {
+      "high_frequency": "每 1 萬公里",
+      "low_frequency": "每半年（依台灣駕駛環境）"
+    },
+    "recommendation": "建議使用 Lexus 原廠機油以確保引擎效能與耐用性"
+  },
+  "services": {
+    "roadside_assistance": {
+      "hotline": "0800-091-091",
+      "period": "領牌日起四年內",
+      "scope": "台灣本島及澎湖，全年無休 24 小時",
+      "includes": ["急修", "代送燃料油", "充氣換胎", "接電啟動", "免費載運回廠"]
+    },
+    "customer_service": {
+      "hotline": "0800-036-036",
+      "ai_channels": ["Lexus 官網", "Lexus Plus App", "Lexus LINE 官方帳號"]
+    },
+    "convenience": [
+      "取送車服務（單程 10 公里內，需提前 2 天預約）",
+      "維修代步車（維修留廠達 72 小時以上，板金噴漆除外）",
+      "入廠定保／維修附洗車吸塵",
+      "夜間延長服務與例假日簡易維修（需預約）"
+    ],
+    "loyalty": {
+      "elite_rewards": ["Elite", "Premium", "Eternity"],
+      "condition": "每年經 Lexus 經銷商投保任意險 + 準時每半年定保",
+      "hotai_points": "保養維修消費回饋 1.5% 和泰 Points，可折抵費用或兌換精品"
+    }
+  },
+  "communication_talking_points": {
+    "price_objection": "原廠服務包含正廠零件保證、技師認證、免費尊榮安檢、道路救援與 Points 回饋，長期總擁有成本更具保障",
+    "wait_time": "可透過 App／LINE／官網提前預約，並善用取送車與夜間服務降低時間成本",
+    "warranty_anxiety": "準時 8 次定保可延長保證；HEV 電池最長 8 年／16 萬公里；售後正廠零件另有 2 年／5 萬保證",
+    "independent_shop_switch": "非原廠維修可能影響保證權益與零件追溯；原廠診斷設備與專用油品為車況最佳化關鍵"
+  },
+  "touchpoints": [
+    {"id": "line", "name": "Lexus LINE 官方帳號", "use": "即時提醒、預約、風險關懷訊息"},
+    {"id": "app", "name": "Lexus Plus App", "use": "保養預約、車輛紀錄、AI 客服"},
+    {"id": "sms", "name": "簡訊／電話關懷", "use": "高風險車主一對一召回與關懷"},
+    {"id": "email", "name": "Email／電子報", "use": "保修權益說明與活動邀請"},
+    {"id": "dealer", "name": "服務專員親訪／回廠", "use": "高價值車主深度溝通"},
+    {"id": "magazine", "name": "《LEXUS 驚探生活誌》", "use": "品牌情感連結與生活提案"}
+  ]
+}

@@ -1,0 +1,291 @@
+{
+  "analyzed_at": "2026-09-15T20:21:23+08:00",
+  "data_source": "crawled",
+  "post_count": 79,
+  "report": {
+    "total_posts": 79,
+    "source_breakdown": {
+      "PTT": 79
+    },
+    "sentiment_breakdown": {
+      "negative": 9,
+      "positive": 36,
+      "neutral": 34
+    },
+    "risk_breakdown": {
+      "low": 68,
+      "medium": 10,
+      "high": 1
+    },
+    "avg_churn_risk": 0.139,
+    "topic_insights": [
+      {
+        "topic": "價格價值",
+        "count": 36,
+        "negative_ratio": 0.167,
+        "avg_risk": 0.173,
+        "top_keywords": [
+          "價格",
+          "便宜",
+          "划算",
+          "成本",
+          "費用"
+        ]
+      },
+      {
+        "topic": "其他",
+        "count": 21,
+        "negative_ratio": 0.095,
+        "avg_risk": 0.099,
+        "top_keywords": []
+      },
+      {
+        "topic": "零件保修",
+        "count": 19,
+        "negative_ratio": 0.211,
+        "avg_risk": 0.158,
+        "top_keywords": [
+          "保固",
+          "維修",
+          "電池",
+          "HEV",
+          "故障"
+        ]
+      },
+      {
+        "topic": "產品品質",
+        "count": 12,
+        "negative_ratio": 0.167,
+        "avg_risk": 0.156,
+        "top_keywords": [
+          "油耗",
+          "品質",
+          "模組"
+        ]
+      },
+      {
+        "topic": "便利性",
+        "count": 11,
+        "negative_ratio": 0.0,
+        "avg_risk": 0.091,
+        "top_keywords": [
+          "時間",
+          "預約",
+          "代步",
+          "等待"
+        ]
+      },
+      {
+        "topic": "服務體驗",
+        "count": 10,
+        "negative_ratio": 0.2,
+        "avg_risk": 0.132,
+        "top_keywords": [
+          "服務",
+          "體驗",
+          "溝通",
+          "信任",
+          "推銷"
+        ]
+      },
+      {
+        "topic": "回饋忠誠",
+        "count": 9,
+        "negative_ratio": 0.111,
+        "avg_risk": 0.113,
+        "top_keywords": [
+          "點數",
+          "回饋",
+          "聯名"
+        ]
+      },
+      {
+        "topic": "替代通路",
+        "count": 4,
+        "negative_ratio": 0.0,
+        "avg_risk": 0.273,
+        "top_keywords": [
+          "外面",
+          "外廠",
+          "獨立"
+        ]
+      }
+    ],
+    "top_risk_factors": [
+      {
+        "factor": "價格敏感",
+        "count": 6,
+        "share_pct": 7.6
+      },
+      {
+        "factor": "明確流失意圖",
+        "count": 6,
+        "share_pct": 7.6
+      },
+      {
+        "factor": "偏好替代保修通路",
+        "count": 3,
+        "share_pct": 3.8
+      },
+      {
+        "factor": "時間與便利痛點",
+        "count": 2,
+        "share_pct": 2.5
+      },
+      {
+        "factor": "關係與溝通裂痕",
+        "count": 2,
+        "share_pct": 2.5
+      }
+    ],
+    "personas": [
+      {
+        "id": "price_switcher",
+        "name": "精算比價轉向者",
+        "tagline": "保證將屆／已過，以價格與 TCO 決定是否離開原廠",
+        "risk_level": "high",
+        "share_pct": 25.3,
+        "demographics": {
+          "車齡": "3–6 年／保證末期或剛過",
+          "車款傾向": "RX / UX / IS 等主流車系",
+          "資訊管道": "PTT、Mobile01 價格討論串",
+          "決策風格": "數據導向、會算五年持有成本"
+        },
+        "needs": [
+          "透明且可比較的報價",
+          "耗材與定保的彈性方案",
+          "保證權益不受影響的清楚說明"
+        ],
+        "pain_points": [
+          "原廠定保與零件報價偏高",
+          "外廠價格差一倍以上的落差感",
+          "不確定折衷保養會不會傷害權益／殘值"
+        ],
+        "preferred_alternatives": [
+          "獨立保修廠",
+          "連鎖輪胎／耗材通路"
+        ],
+        "key_considerations": [
+          "總擁有成本",
+          "保證／延長保證條件",
+          "中古車殘值與維修紀錄"
+        ],
+        "representative_quotes": [
+          "「[新聞] 豐田新社長:考慮砍部分豐田或Lexus車款,不然成本快失控」— Lexus LS應該也會GG,賣不好+沒有存在感\n\n其實要削減成本,還有一個方法,就是把DNGA…",
+          "「[閒聊] 這次的Lexus ES系列」— 之前接洽過的業務傳來這次大改款的細項\nES300h第一波只有豪華版跟頂級版\n沒有F版及旗艦款\n然…"
+        ],
+        "recommended_strategy": "用「權益保全 + 分期價值」取代單純折扣戰，強調準時定保延長保證、正廠零件保證與診斷能力。"
+      },
+      {
+        "id": "time_friction",
+        "name": "時間敏感體驗者",
+        "tagline": "認同品牌服務，但被等待、缺料與行程摩擦推向外廠",
+        "risk_level": "medium",
+        "share_pct": 5.1,
+        "demographics": {
+          "車齡": "1–4 年",
+          "生活型態": "都會通勤、行程緊湊",
+          "數位習慣": "高（App / LINE 預約）",
+          "決策風格": "體驗導向，怕浪費時間"
+        },
+        "needs": [
+          "可預期的工時",
+          "取送車／夜間服務",
+          "缺料與代步車的主動溝通"
+        ],
+        "pain_points": [
+          "未預約等待過久",
+          "零件缺料資訊不透明",
+          "代步車需看調度的不確定感"
+        ],
+        "preferred_alternatives": [
+          "就近快速保修據點"
+        ],
+        "key_considerations": [
+          "時間成本",
+          "溝通透明度",
+          "服務一致性"
+        ],
+        "representative_quotes": [
+          "「Re: [新聞] Lexus ES300h迎改裝新品！三大底盤強化部」— 和泰的作法\n絕對不是針對真的有需求的人去賣\n而是搭著新車騙不懂的人\n\n上次去看Rav 4\n朋友比…",
+          "「[閒聊] Lexus車主付錢買了個空虛」— 今日Threads熱門\nhttps://reurl.cc/VnNd0n\n以下是苦主寫的\n\n翻了一…"
+        ],
+        "recommended_strategy": "以便利接觸點（取送車、夜間、進度推播）降低摩擦，把『省心省時』做成可感知的原廠價值。"
+      },
+      {
+        "id": "trust_seeker",
+        "name": "信任與專業守護者",
+        "tagline": "在意被理解與專業診斷，價格可接受但拒絕制式推銷",
+        "risk_level": "medium",
+        "share_pct": 0.0,
+        "demographics": {
+          "車齡": "2–5 年",
+          "關注點": "異音、電子系統、診斷正確性",
+          "關係期待": "固定專員、被記住的感受",
+          "決策風格": "情感 + 專業雙軌"
+        },
+        "needs": [
+          "清楚的檢測說明與路試紀錄",
+          "非強迫式的方案建議",
+          "專員關係連續性"
+        ],
+        "pain_points": [
+          "多次告知『正常』但問題仍在",
+          "專員更換後變制式推銷",
+          "感覺不被傾聽"
+        ],
+        "preferred_alternatives": [
+          "口碑工作室（解說型師傅）"
+        ],
+        "key_considerations": [
+          "信任",
+          "專業設備",
+          "被尊重的溝通"
+        ],
+        "representative_quotes": [
+          "（此 Persona 在目前樣本中樣本較少，採規則模板描繪）"
+        ],
+        "recommended_strategy": "以診斷透明度與專屬管家式溝通重建信任，再用原廠專用診斷與電池／電子系統保證作理性支撐。"
+      },
+      {
+        "id": "loyalty_advocate",
+        "name": "尊榮體驗擁護者",
+        "tagline": "高度認同取送車、救援與服務氛圍，是口碑擴散核心",
+        "risk_level": "low",
+        "share_pct": 69.6,
+        "demographics": {
+          "車齡": "新車～3 年為主",
+          "價值觀": "安全感、儀式感、品牌溫度",
+          "活躍管道": "Dcard 心得、社群分享",
+          "決策風格": "體驗優先，價格次之"
+        },
+        "needs": [
+          "持續被看見的尊榮感",
+          "生活風格活動與內容",
+          "數位權益提醒（非硬推銷）"
+        ],
+        "pain_points": [
+          "若後續變得制式，容易失落"
+        ],
+        "preferred_alternatives": [],
+        "key_considerations": [
+          "服務溫度",
+          "品牌一致性"
+        ],
+        "representative_quotes": [
+          "「[閒聊] Lexus NX 小改款發表」— https://i.mopix.cc/VgkYAT.jpg\n車頭\nhttps://i.mopix…",
+          "「[新聞] Lexus性能版RX首度現身!全新渦輪引擎搭配」— 標題\nLexus性能版RX首度現身！全新渦輪引擎搭配油電 動力輸出將媲美超跑\n\n來源\n自由時報\n…"
+        ],
+        "recommended_strategy": "將擁護者轉為推薦大使，並用個人化權益進度（定保次數、Points、活動）維持黏著。"
+      }
+    ],
+    "ai_methods": [
+      "中文詞典規則 + 正負向詞彙計分之情緒分析（可替換為 Transformer 中文情緒模型）",
+      "多標籤主題分類（服務體驗／零件保修／價格價值／便利性／回饋忠誠／替代通路）",
+      "流失風險評分模型（意圖、價格敏感、保證轉換、便利摩擦、信任裂痕加權）",
+      "Persona 分群：風險因子共現規則分群（可延伸為嵌入向量聚類）",
+      "知識庫增強生成（RAG）：車主權益手冊結構化知識 → 溝通文案"
+    ],
+    "executive_summary": "在 79 則 Lexus 相關公開討論中，高流失風險內容約占 1.3%，平均流失風險指數 0.139。負面情緒主要集中於價格價值、零件保修與替代通路討論；正面聲量則來自取送車、道路救援與服務安全感。建議優先鎖定「精算比價轉向者」與時間摩擦型客群，以權益透明與便利接觸點進行攔截。"
+  }
+}

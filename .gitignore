@@ -1,0 +1,39 @@
+# 環境與機密
+.env
+.env.local
+*.pem
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 作業系統
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# 爬蟲 session（含登入狀態，勿分享）
+data/dcard_cookies.json
+
+# 暫存 / 診斷
+data/dcard_probe*.json
+data/dcard_debug.json
+data/dcard_debug.txt
+data/dcard_cookie_test.json
+pdf_extract.txt
+
+# Playwright 瀏覽器快取（本機安裝即可）
+.playwright/

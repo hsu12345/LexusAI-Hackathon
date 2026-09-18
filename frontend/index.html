@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LexusAI｜流失風險洞察與智慧溝通</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <div class="grain"></div>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">LEXUS</span>
+      <span class="brand-sub">Aftersales Intelligence</span>
+    </div>
+    <nav class="nav">
+      <button class="nav-btn active" data-view="overview">輿情總覽</button>
+      <button class="nav-btn" data-view="personas">顧客 Persona</button>
+      <button class="nav-btn" data-view="risks">風險議題</button>
+      <button class="nav-btn" data-view="comm">AI 溝通計畫</button>
+      <button class="nav-btn" data-view="flow">系統流程</button>
+    </nav>
+  </header>
+
+  <main>
+    <section id="view-overview" class="view active">
+      <div class="hero-panel">
+        <p class="eyebrow">產出 1｜AI 網路輿情洞察</p>
+        <h1>潛在流失風險洞察<br />售後決策儀表板</h1>
+        <p class="lede" id="executive-summary">載入洞察中…</p>
+      </div>
+      <div class="metric-row" id="metric-row"></div>
+      <div class="grid-2">
+        <article class="panel">
+          <h2>情緒與來源分布</h2>
+          <div id="sentiment-bars" class="bars"></div>
+          <div id="source-chips" class="chips"></div>
+        </article>
+        <article class="panel">
+          <h2>主題風險熱度</h2>
+          <div id="topic-table"></div>
+        </article>
+      </div>
+      <article class="panel">
+        <h2>最新高風險討論</h2>
+        <div id="risk-feed" class="feed"></div>
+      </article>
+    </section>
+
+    <section id="view-personas" class="view">
+      <div class="section-head">
+        <p class="eyebrow">顧客樣貌</p>
+        <h1>四個關鍵 Persona</h1>
+        <p class="lede">以 NLP 風險因子共現分群，描繪具潛在流失傾向與高黏著擁護者輪廓。</p>
+      </div>
+      <div id="persona-grid" class="persona-grid"></div>
+    </section>
+
+    <section id="view-risks" class="view">
+      <div class="section-head">
+        <p class="eyebrow">風險因素</p>
+        <h1>關鍵流失驅動因子</h1>
+      </div>
+      <div class="grid-2">
+        <article class="panel">
+          <h2>高頻風險因子</h2>
+          <div id="factor-list" class="factor-list"></div>
+        </article>
+        <article class="panel">
+          <h2>AI 技術說明</h2>
+          <ul id="ai-methods" class="method-list"></ul>
+        </article>
+      </div>
+    </section>
+
+    <section id="view-comm" class="view">
+      <div class="section-head">
+        <p class="eyebrow">產出 2｜AI 溝通計畫</p>
+        <h1>針對目標 Persona 的智慧溝通</h1>
+        <p class="lede">結合車主權益手冊知識庫，生成可落地的接觸點文案與策略。</p>
+      </div>
+      <div class="comm-controls">
+        <label for="persona-select">選擇 Persona</label>
+        <select id="persona-select"></select>
+      </div>
+      <div id="comm-plan"></div>
+    </section>
+
+    <section id="view-flow" class="view">
+      <div class="section-head">
+        <p class="eyebrow">系統架構</p>
+        <h1>AI 方案運作流程</h1>
+      </div>
+      <div class="flow" id="system-flow"></div>
+      <article class="panel arch">
+        <h2>技術架構摘要</h2>
+        <div class="arch-grid">
+          <div><h3>資料層</h3><p>PTT / Dcard / Mobile01 公開討論（示範集）＋ Lexus 車主權益知識庫</p></div>
+          <div><h3>分析層</h3><p>主題標籤、情緒、流失風險評分、Persona 分群</p></div>
+          <div><h3>決策層</h3><p>售後儀表板：洞察報告、風險排程、溝通審核</p></div>
+          <div><h3>行動層</h3><p>LINE / App / Email / 專員腳本 — RAG 增強內容生成</p></div>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span>LexusAI Hackathon MVP</span>
+    <span>目標使用者：Lexus 售後服務部門決策者</span>
+  </footer>
+  <script src="/static/app.js"></script>
+</body>
+</html>
