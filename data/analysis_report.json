@@ -1,141 +1,159 @@
 {
-  "analyzed_at": "2026-09-15T20:21:23+08:00",
+  "analyzed_at": "2026-10-02T16:13:59+08:00",
   "data_source": "crawled",
-  "post_count": 79,
+  "post_count": 1642,
   "report": {
-    "total_posts": 79,
+    "total_posts": 1642,
     "source_breakdown": {
-      "PTT": 79
+      "PTT": 1500,
+      "Dcard": 25,
+      "Threads": 117
     },
     "sentiment_breakdown": {
-      "negative": 9,
-      "positive": 36,
-      "neutral": 34
+      "negative": 198,
+      "positive": 519,
+      "neutral": 925
     },
     "risk_breakdown": {
-      "low": 68,
-      "medium": 10,
-      "high": 1
+      "low": 1379,
+      "medium": 199,
+      "high": 64
     },
-    "avg_churn_risk": 0.139,
+    "avg_churn_risk": 0.179,
     "topic_insights": [
       {
         "topic": "價格價值",
-        "count": 36,
-        "negative_ratio": 0.167,
-        "avg_risk": 0.173,
+        "count": 856,
+        "negative_ratio": 0.159,
+        "avg_risk": 0.229,
         "top_keywords": [
           "價格",
+          "報價",
+          "貴",
           "便宜",
-          "划算",
-          "成本",
           "費用"
         ]
       },
       {
         "topic": "其他",
-        "count": 21,
-        "negative_ratio": 0.095,
-        "avg_risk": 0.099,
+        "count": 453,
+        "negative_ratio": 0.066,
+        "avg_risk": 0.094,
         "top_keywords": []
       },
       {
-        "topic": "零件保修",
-        "count": 19,
-        "negative_ratio": 0.211,
-        "avg_risk": 0.158,
-        "top_keywords": [
-          "保固",
-          "維修",
-          "電池",
-          "HEV",
-          "故障"
-        ]
-      },
-      {
-        "topic": "產品品質",
-        "count": 12,
-        "negative_ratio": 0.167,
-        "avg_risk": 0.156,
-        "top_keywords": [
-          "油耗",
-          "品質",
-          "模組"
-        ]
-      },
-      {
         "topic": "便利性",
-        "count": 11,
-        "negative_ratio": 0.0,
-        "avg_risk": 0.091,
+        "count": 364,
+        "negative_ratio": 0.124,
+        "avg_risk": 0.244,
         "top_keywords": [
           "時間",
-          "預約",
           "代步",
-          "等待"
+          "App",
+          "等待",
+          "預約"
+        ]
+      },
+      {
+        "topic": "零件保修",
+        "count": 349,
+        "negative_ratio": 0.158,
+        "avg_risk": 0.236,
+        "top_keywords": [
+          "電池",
+          "保固",
+          "維修",
+          "零件",
+          "HEV"
         ]
       },
       {
         "topic": "服務體驗",
-        "count": 10,
-        "negative_ratio": 0.2,
-        "avg_risk": 0.132,
+        "count": 199,
+        "negative_ratio": 0.111,
+        "avg_risk": 0.253,
         "top_keywords": [
-          "服務",
           "體驗",
+          "服務",
           "溝通",
-          "信任",
-          "推銷"
+          "態度",
+          "安全感"
         ]
       },
       {
-        "topic": "回饋忠誠",
-        "count": 9,
-        "negative_ratio": 0.111,
-        "avg_risk": 0.113,
+        "topic": "產品品質",
+        "count": 164,
+        "negative_ratio": 0.14,
+        "avg_risk": 0.185,
         "top_keywords": [
-          "點數",
-          "回饋",
-          "聯名"
+          "油耗",
+          "品質",
+          "車況",
+          "保值",
+          "模組"
         ]
       },
       {
         "topic": "替代通路",
-        "count": 4,
-        "negative_ratio": 0.0,
-        "avg_risk": 0.273,
+        "count": 79,
+        "negative_ratio": 0.165,
+        "avg_risk": 0.424,
         "top_keywords": [
-          "外面",
           "外廠",
-          "獨立"
+          "外面",
+          "獨立",
+          "非原廠"
+        ]
+      },
+      {
+        "topic": "回饋忠誠",
+        "count": 77,
+        "negative_ratio": 0.143,
+        "avg_risk": 0.191,
+        "top_keywords": [
+          "點數",
+          "回饋",
+          "聯名",
+          "Points",
+          "禮遇"
         ]
       }
     ],
     "top_risk_factors": [
       {
         "factor": "價格敏感",
-        "count": 6,
-        "share_pct": 7.6
+        "count": 379,
+        "share_pct": 23.1
       },
       {
         "factor": "明確流失意圖",
-        "count": 6,
-        "share_pct": 7.6
+        "count": 97,
+        "share_pct": 5.9
       },
       {
         "factor": "偏好替代保修通路",
-        "count": 3,
-        "share_pct": 3.8
+        "count": 93,
+        "share_pct": 5.7
       },
       {
         "factor": "時間與便利痛點",
-        "count": 2,
-        "share_pct": 2.5
+        "count": 75,
+        "share_pct": 4.6
       },
       {
         "factor": "關係與溝通裂痕",
-        "count": 2,
-        "share_pct": 2.5
+        "count": 29,
+        "share_pct": 1.8
+      },
+      {
+        "factor": "問題解決信任危機",
+        "count": 21,
+        "share_pct": 1.3
+      },
+      {
+        "factor": "保證期轉換風險",
+        "count": 8,
+        "share_pct": 0.5
       }
     ],
     "personas": [
@@ -144,7 +162,7 @@
         "name": "精算比價轉向者",
         "tagline": "保證將屆／已過，以價格與 TCO 決定是否離開原廠",
         "risk_level": "high",
-        "share_pct": 25.3,
+        "share_pct": 36.4,
         "demographics": {
           "車齡": "3–6 年／保證末期或剛過",
           "車款傾向": "RX / UX / IS 等主流車系",
@@ -171,8 +189,8 @@
           "中古車殘值與維修紀錄"
         ],
         "representative_quotes": [
-          "「[新聞] 豐田新社長:考慮砍部分豐田或Lexus車款,不然成本快失控」— Lexus LS應該也會GG,賣不好+沒有存在感\n\n其實要削減成本,還有一個方法,就是把DNGA…",
-          "「[閒聊] 這次的Lexus ES系列」— 之前接洽過的業務傳來這次大改款的細項\nES300h第一波只有豪華版跟頂級版\n沒有F版及旗艦款\n然…"
+          "「Re: [閒聊] Lexus的NX ES能加裝通風椅了」— 手機排版請見諒，底下是車友之前在群組分享的截圖，車美仕這款通風椅應該是外廠開發回\n賣給和泰「原廠…",
+          "「Re: [問題] UX300H還是NX200?」— ※ 引述《kk60778 (撇海小英雄)》之銘言：\n: 各位萬能的版友好\n: 近期有換車需求，目…"
         ],
         "recommended_strategy": "用「權益保全 + 分期價值」取代單純折扣戰，強調準時定保延長保證、正廠零件保證與診斷能力。"
       },
@@ -181,7 +199,7 @@
         "name": "時間敏感體驗者",
         "tagline": "認同品牌服務，但被等待、缺料與行程摩擦推向外廠",
         "risk_level": "medium",
-        "share_pct": 5.1,
+        "share_pct": 3.8,
         "demographics": {
           "車齡": "1–4 年",
           "生活型態": "都會通勤、行程緊湊",
@@ -207,8 +225,8 @@
           "服務一致性"
         ],
         "representative_quotes": [
-          "「Re: [新聞] Lexus ES300h迎改裝新品！三大底盤強化部」— 和泰的作法\n絕對不是針對真的有需求的人去賣\n而是搭著新車騙不懂的人\n\n上次去看Rav 4\n朋友比…",
-          "「[閒聊] Lexus車主付錢買了個空虛」— 今日Threads熱門\nhttps://reurl.cc/VnNd0n\n以下是苦主寫的\n\n翻了一…"
+          "「[菜單] LEXUS ES200 頂級版」— 以下為建議資訊\n車輛廠牌/年份/型號：\nLEXUS 正2021年式 ES200\n車輛原廠編成等級…",
+          "「[售車] 2017 Lexus CT200h F-Sport 白色」— 車輛品牌/產地/出廠年月：　Lexus CT200h F-Sort 2017年06月出廠/10月…"
         ],
         "recommended_strategy": "以便利接觸點（取送車、夜間、進度推播）降低摩擦，把『省心省時』做成可感知的原廠價值。"
       },
@@ -217,7 +235,7 @@
         "name": "信任與專業守護者",
         "tagline": "在意被理解與專業診斷，價格可接受但拒絕制式推銷",
         "risk_level": "medium",
-        "share_pct": 0.0,
+        "share_pct": 0.4,
         "demographics": {
           "車齡": "2–5 年",
           "關注點": "異音、電子系統、診斷正確性",
@@ -243,7 +261,8 @@
           "被尊重的溝通"
         ],
         "representative_quotes": [
-          "（此 Persona 在目前樣本中樣本較少，採規則模板描繪）"
+          "「2026 Mazda CX30頂規版 vs. Lexus Ux300h豪華版？-首次購車女孩抉擇中🥺」— 煩惱-\n問題1:［車內異音比例高］：原本想買Mazda cx30了，但看到網路上滿多人說cx30…",
+          "「[問題] 請問LEXUS車主」— 請教各位前輩\n小弟的車是2018年式NX200\n在重踩油門時發現會出現異音\n這個聲音大概比引擎聲…"
         ],
         "recommended_strategy": "以診斷透明度與專屬管家式溝通重建信任，再用原廠專用診斷與電池／電子系統保證作理性支撐。"
       },
@@ -252,7 +271,7 @@
         "name": "尊榮體驗擁護者",
         "tagline": "高度認同取送車、救援與服務氛圍，是口碑擴散核心",
         "risk_level": "low",
-        "share_pct": 69.6,
+        "share_pct": 59.4,
         "demographics": {
           "車齡": "新車～3 年為主",
           "價值觀": "安全感、儀式感、品牌溫度",
@@ -286,6 +305,6 @@
       "Persona 分群：風險因子共現規則分群（可延伸為嵌入向量聚類）",
       "知識庫增強生成（RAG）：車主權益手冊結構化知識 → 溝通文案"
     ],
-    "executive_summary": "在 79 則 Lexus 相關公開討論中，高流失風險內容約占 1.3%，平均流失風險指數 0.139。負面情緒主要集中於價格價值、零件保修與替代通路討論；正面聲量則來自取送車、道路救援與服務安全感。建議優先鎖定「精算比價轉向者」與時間摩擦型客群，以權益透明與便利接觸點進行攔截。"
+    "executive_summary": "在 1642 則 Lexus 相關公開討論中，高流失風險內容約占 3.9%，平均流失風險指數 0.179。負面情緒主要集中於價格價值、零件保修與替代通路討論；正面聲量則來自取送車、道路救援與服務安全感。建議優先鎖定「精算比價轉向者」與時間摩擦型客群，以權益透明與便利接觸點進行攔截。"
   }
 }

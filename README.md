@@ -62,22 +62,46 @@ LexusAI/
 ## 爬蟲說明
 
 ```bash
-python scripts/crawl.py                     # PTT + Mobile01 + Dcard
+python scripts/crawl.py                     # PTT + Mobile01 + Dcard（不含 Threads）
 python scripts/crawl.py --ptt-only          # 只爬 PTT（較穩定）
 python scripts/crawl.py --dcard-only        # 只爬 Dcard
+python scripts/crawl.py --mobile01-only     # 只爬 Mobile01
+python scripts/crawl.py --threads-only      # 只爬 Threads（首次需手動登入）
+python scripts/crawl.py --include-threads   # 完整爬取時一併加入 Threads
 python scripts/crawl.py --skip-dcard        # 跳過 Dcard
 python scripts/crawl.py --max-articles 80 --max-search-pages 8
+```
+
+**Mobile01 特別說明**：Mobile01 由 Akamai WAF 防護，部分機房／雲端 IP 會直接被拒於邊緣層（403 Access
+Denied），與 User-Agent 或是否使用瀏覽器無關。若遇到此狀況，可透過 `--proxy` 指定代理伺服器改善：
+
+```bash
+python scripts/crawl.py --mobile01-only --proxy http://user:pass@host:port
+# 或 SOCKS5（需先 pip install "requests[socks]"）
+python scripts/crawl.py --mobile01-only --proxy socks5://host:port
 ```
 
 **Dcard 特別說明**：Dcard 有 Cloudflare 防護，爬蟲會短暫開啟 Edge 瀏覽器建立 session（預設非 headless）。
 首次執行後 cookies 會存到 `data/dcard_cookies.json`。若失敗可重試或執行：
 `python -m playwright install chromium`
 
+**Threads 特別說明**：Threads 網頁版搜尋需要登入帳號才看得到結果，且沒有像 Dcard 那樣可直接呼叫的公開
+API，因此改用「開可見瀏覽器 → 首次手動登入 → 存 cookie → 之後重複使用」的模式，並直接在渲染後的頁面
+上擷取貼文內容（DOM scraping）。執行 `--threads-only` 或 `--include-threads` 後會跳出瀏覽器視窗，
+請在時限內（預設 180 秒，可用 `CrawlConfig.threads_login_wait_sec` 調整）手動登入一次；之後 session
+會存到 `data/threads_cookies.json` 重複使用。由於 Threads 頁面結構（DOM class 名稱）可能隨時改版，
+若抓不到內容，多半是選擇器需要依當下頁面結構調整。
+
+**反偵測／穩定性強化**：三個爬蟲共用的 HTTP client（`backend/crawler/http_client.py`）已加上
+自動重試（429／5xx 錯誤，指數退避＋隨機延遲）與更完整的瀏覽器 header；403 這類 WAF 直接拒絕不會重試
+（重試沒有意義，見 Mobile01 說明）。Playwright 瀏覽器（Dcard／Threads）共用 `backend/crawler/stealth.py`
+的初始化腳本，隱藏 `navigator.webdriver` 等常見自動化偵測指紋。
+
 輸出：
 - `data/crawled_posts.json` — 爬取結果（Dashboard 優先讀取）
 - `data/crawl_meta.json` — 爬取時間與來源統計
 
-**注意**：僅抓取公開頁面，請遵守 PTT / Mobile01 使用條款，並保留合理請求間隔（預設 1.2 秒）。
+**注意**：僅抓取公開頁面，請遵守 PTT / Mobile01 / Threads 使用條款，並保留合理請求間隔（預設 1.2 秒）。
 
 ## 資料說明
 

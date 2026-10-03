@@ -9,6 +9,7 @@ from urllib.parse import quote
 
 from .config import CrawlConfig
 from .normalizer import is_relevant
+from .stealth import apply_stealth, stealth_launch_args
 
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_COOKIE_PATH = ROOT / "data" / "dcard_cookies.json"
@@ -42,8 +43,10 @@ class DcardBrowserSession:
         self._playwright = sync_playwright().start()
         launch_kwargs: dict[str, Any] = {
             "headless": self.headless,
-            "args": ["--disable-blink-features=AutomationControlled"],
+            "args": stealth_launch_args(),
         }
+        if getattr(self.config, "proxy", None):
+            launch_kwargs["proxy"] = {"server": self.config.proxy}
         if getattr(self.config, "dcard_use_edge", True):
             try:
                 self._browser = self._playwright.chromium.launch(channel="msedge", **launch_kwargs)
@@ -57,6 +60,7 @@ class DcardBrowserSession:
             viewport={"width": 1366, "height": 768},
             user_agent=self.config.user_agent,
         )
+        apply_stealth(self._context)
         if self.cookie_path.exists():
             try:
                 cookies = json.loads(self.cookie_path.read_text(encoding="utf-8"))
@@ -152,24 +156,19 @@ class DcardCrawler:
         refs: dict[int, DcardPostRef] = {}
 
         for keyword in self.config.dcard_search_keywords:
-            limit = min(30, max(10, self.config.max_search_pages * 10))
+            limit = min(100, max(10, self.config.max_search_pages * 10))
             url = f"{API_BASE}/search/posts?query={quote(keyword)}&limit={limit}"
+            # 搜尋結果不用標題篩選（標題常沒寫 Lexus），抓內文後 fetch_post 會再做全文篩選
             try:
                 for ref in self._fetch_list(session, url):
-                    if is_relevant(
-                        ref.title,
-                        self.config.relevance_keywords,
-                        self.config.service_keywords,
-                        aftersales_only=False,
-                    ):
-                        refs[ref.post_id] = ref
+                    refs.setdefault(ref.post_id, ref)
             except Exception:
                 pass
             time.sleep(max(self.config.request_delay_sec, 3.0))
 
         for forum in self.config.dcard_forums:
             before: int | None = None
-            for _ in range(min(2, self.config.max_search_pages)):
+            for _ in range(self.config.dcard_forum_pages):
                 url = f"{API_BASE}/forums/{forum}/posts?popular=false&limit=30"
                 if before:
                     url += f"&before={before}"
@@ -237,7 +236,11 @@ class DcardCrawler:
         try:
             with DcardBrowserSession(self.config) as session:
                 refs = self.collect_refs(session)
-                for ref in refs[: self.max_posts]:
+                print(f"      [Dcard] 候選文章 {len(refs)} 篇，最多抓取 {self.max_posts} 篇")
+                # 抓到 max_posts 篇通過篩選的文章才停，而非只抓前 N 個候選
+                for ref in refs:
+                    if len(posts) >= self.max_posts:
+                        break
                     post = self.fetch_post(session, ref)
                     if post:
                         posts.append(post)

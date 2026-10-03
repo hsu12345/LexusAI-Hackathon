@@ -23,6 +23,7 @@ def run_crawl(
     include_ptt: bool = True,
     include_mobile01: bool = True,
     include_dcard: bool = True,
+    include_threads: bool = False,
 ) -> dict[str, Any]:
     config = config or CrawlConfig()
     client = RateLimitedClient(config)
@@ -30,9 +31,10 @@ def run_crawl(
     ptt_raw: list[dict] = []
     m01_raw: list[dict] = []
     dcard_raw: list[dict] = []
+    threads_raw: list[dict] = []
 
     step = 1
-    total_steps = sum([include_ptt, include_mobile01, include_dcard, 2])
+    total_steps = sum([include_ptt, include_mobile01, include_dcard, include_threads, 2])
 
     if include_ptt:
         print(f"[{step}/{total_steps}] 開始爬取 PTT…")
@@ -63,8 +65,20 @@ def run_crawl(
             print(f"      Dcard 跳過：{exc}")
         step += 1
 
+    if include_threads:
+        print(f"[{step}/{total_steps}] 開始爬取 Threads（Playwright，需登入）…")
+        try:
+            from .threads import ThreadsCrawler
+
+            threads = ThreadsCrawler(config)
+            threads_raw = threads.crawl()
+            print(f"      Threads 取得 {len(threads_raw)} 篇")
+        except Exception as exc:
+            print(f"      Threads 跳過：{exc}")
+        step += 1
+
     print(f"[{step}/{total_steps}] 正規化與去重…")
-    normalized = [normalize_post(p) for p in ptt_raw + m01_raw + dcard_raw]
+    normalized = [normalize_post(p) for p in ptt_raw + m01_raw + dcard_raw + threads_raw]
 
     # 部分爬取時保留既有資料，避免覆蓋
     existing: list[dict] = []
@@ -102,6 +116,7 @@ def run_crawl(
             "PTT": sum(1 for p in merged if p.get("source") == "PTT"),
             "Mobile01": sum(1 for p in merged if p.get("source") == "Mobile01"),
             "Dcard": sum(1 for p in merged if p.get("source") == "Dcard"),
+            "Threads": sum(1 for p in merged if p.get("source") == "Threads"),
             "Sample": sum(1 for p in merged if "示範" in p.get("source", "")),
         },
         "real_posts": sum(1 for p in merged if "example" not in (p.get("url") or "")),

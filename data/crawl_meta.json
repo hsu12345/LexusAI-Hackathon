@@ -1,11 +1,12 @@
 {
-  "crawled_at": "2026-09-15T20:21:23+08:00",
-  "total_posts": 79,
+  "crawled_at": "2026-10-02T16:13:58+08:00",
+  "total_posts": 1642,
   "sources": {
-    "PTT": 79,
+    "PTT": 1500,
     "Mobile01": 0,
-    "Dcard": 0,
+    "Dcard": 25,
+    "Threads": 117,
     "Sample": 0
   },
-  "real_posts": 79
+  "real_posts": 1642
 }
