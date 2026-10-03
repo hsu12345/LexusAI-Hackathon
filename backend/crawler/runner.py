@@ -7,7 +7,7 @@ from typing import Any
 
 from .config import CrawlConfig
 from .http_client import RateLimitedClient
-from .mobile01 import Mobile01Crawler
+from .mobile01 import Mobile01BrowserClient, Mobile01Crawler
 from .normalizer import dedupe_posts, normalize_post
 from .ptt import PttCrawler
 
@@ -46,8 +46,9 @@ def run_crawl(
     if include_mobile01:
         print(f"[{step}/{total_steps}] 開始爬取 Mobile01…")
         try:
-            m01 = Mobile01Crawler(client, config)
-            m01_raw = m01.crawl()
+            # Mobile01 會 403 拒絕 requests，改用一般瀏覽器讀取
+            with Mobile01BrowserClient(config) as browser:
+                m01_raw = Mobile01Crawler(browser, config).crawl()
             print(f"      Mobile01 取得 {len(m01_raw)} 篇")
         except Exception as exc:
             print(f"      Mobile01 跳過：{exc}")

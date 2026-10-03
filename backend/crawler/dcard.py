@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -41,10 +42,12 @@ class DcardBrowserSession:
         from playwright.sync_api import sync_playwright
 
         self._playwright = sync_playwright().start()
-        launch_kwargs: dict[str, Any] = {
-            "headless": self.headless,
-            "args": stealth_launch_args(),
-        }
+        # 實測：加上 stealth 參數／init script 反而會被 Cloudflare 判定為機器人而封鎖，
+        # 一般 Edge 瀏覽器則可正常瀏覽，因此預設不套用（dcard_stealth=False）
+        use_stealth = getattr(self.config, "dcard_stealth", False)
+        launch_kwargs: dict[str, Any] = {"headless": self.headless}
+        if use_stealth:
+            launch_kwargs["args"] = stealth_launch_args()
         if getattr(self.config, "proxy", None):
             launch_kwargs["proxy"] = {"server": self.config.proxy}
         if getattr(self.config, "dcard_use_edge", True):
@@ -55,12 +58,12 @@ class DcardBrowserSession:
         else:
             self._browser = self._playwright.chromium.launch(**launch_kwargs)
 
-        self._context = self._browser.new_context(
-            locale="zh-TW",
-            viewport={"width": 1366, "height": 768},
-            user_agent=self.config.user_agent,
-        )
-        apply_stealth(self._context)
+        context_kwargs: dict[str, Any] = {"locale": "zh-TW", "viewport": {"width": 1366, "height": 768}}
+        if use_stealth:
+            context_kwargs["user_agent"] = self.config.user_agent
+        self._context = self._browser.new_context(**context_kwargs)
+        if use_stealth:
+            apply_stealth(self._context)
         if self.cookie_path.exists():
             try:
                 cookies = json.loads(self.cookie_path.read_text(encoding="utf-8"))
@@ -152,18 +155,48 @@ class DcardCrawler:
             return self._parse_list(items)
         return []
 
+    def _search_page_refs(self, session: DcardBrowserSession, keyword: str) -> list[DcardPostRef]:
+        """從網站搜尋頁收集文章連結。
+
+        搜尋 API（/search/posts）實測會回傳與關鍵字無關的文章，網站搜尋頁的結果才準確；
+        這裡只取連結，標題與內文之後由 fetch_post 透過文章 API 取得。
+        """
+        page = session.page
+        assert page is not None
+        page.goto(f"https://www.dcard.tw/search?query={quote(keyword)}", timeout=60000, wait_until="domcontentloaded")
+        try:
+            page.wait_for_selector('a[href*="/p/"]', timeout=20000)
+        except Exception:
+            return []
+
+        found: dict[int, DcardPostRef] = {}
+        for _ in range(self.config.dcard_search_scrolls + 1):
+            hrefs = page.eval_on_selector_all('a[href*="/p/"]', "els => els.map(e => e.getAttribute('href'))")
+            for href in hrefs:
+                m = re.match(r"^/f/([^/]+)/p/(\d+)", href or "")
+                if m and int(m.group(2)) not in found:
+                    alias, post_id = m.group(1), int(m.group(2))
+                    found[post_id] = DcardPostRef(
+                        post_id=post_id,
+                        title="",
+                        forum_alias=alias,
+                        forum_name=alias,
+                        url=f"https://www.dcard.tw/f/{alias}/p/{post_id}",
+                    )
+            page.mouse.wheel(0, 2400)
+            page.wait_for_timeout(1500)
+        return list(found.values())
+
     def collect_refs(self, session: DcardBrowserSession) -> list[DcardPostRef]:
         refs: dict[int, DcardPostRef] = {}
 
+        # 搜尋結果不用標題篩選（標題常沒寫 Lexus），抓內文後 fetch_post 會再做全文篩選
         for keyword in self.config.dcard_search_keywords:
-            limit = min(100, max(10, self.config.max_search_pages * 10))
-            url = f"{API_BASE}/search/posts?query={quote(keyword)}&limit={limit}"
-            # 搜尋結果不用標題篩選（標題常沒寫 Lexus），抓內文後 fetch_post 會再做全文篩選
             try:
-                for ref in self._fetch_list(session, url):
+                for ref in self._search_page_refs(session, keyword):
                     refs.setdefault(ref.post_id, ref)
-            except Exception:
-                pass
+            except Exception as exc:
+                print(f"      [Dcard] 關鍵字「{keyword}」略過：{exc}")
             time.sleep(max(self.config.request_delay_sec, 3.0))
 
         for forum in self.config.dcard_forums:
@@ -219,7 +252,7 @@ class DcardCrawler:
         return {
             "id": f"dcard_{ref.post_id}",
             "source": "Dcard",
-            "board": ref.forum_name,
+            "board": data.get("forumName") or ref.forum_name,
             "title": title,
             "content": content[:4000],
             "posted_at": data.get("createdAt"),

@@ -1,31 +1,32 @@
 {
-  "analyzed_at": "2026-10-02T16:13:59+08:00",
+  "analyzed_at": "2026-10-03T22:41:44+08:00",
   "data_source": "crawled",
-  "post_count": 1642,
+  "post_count": 1942,
   "report": {
-    "total_posts": 1642,
+    "total_posts": 1942,
     "source_breakdown": {
       "PTT": 1500,
       "Dcard": 25,
-      "Threads": 117
+      "Threads": 117,
+      "Mobile01": 300
     },
     "sentiment_breakdown": {
-      "negative": 198,
-      "positive": 519,
-      "neutral": 925
+      "negative": 236,
+      "positive": 672,
+      "neutral": 1034
     },
     "risk_breakdown": {
-      "low": 1379,
-      "medium": 199,
-      "high": 64
+      "low": 1569,
+      "medium": 271,
+      "high": 102
     },
-    "avg_churn_risk": 0.179,
+    "avg_churn_risk": 0.191,
     "topic_insights": [
       {
         "topic": "價格價值",
-        "count": 856,
-        "negative_ratio": 0.159,
-        "avg_risk": 0.229,
+        "count": 977,
+        "negative_ratio": 0.162,
+        "avg_risk": 0.244,
         "top_keywords": [
           "價格",
           "報價",
@@ -36,16 +37,16 @@
       },
       {
         "topic": "其他",
-        "count": 453,
-        "negative_ratio": 0.066,
-        "avg_risk": 0.094,
+        "count": 507,
+        "negative_ratio": 0.071,
+        "avg_risk": 0.095,
         "top_keywords": []
       },
       {
         "topic": "便利性",
-        "count": 364,
-        "negative_ratio": 0.124,
-        "avg_risk": 0.244,
+        "count": 480,
+        "negative_ratio": 0.121,
+        "avg_risk": 0.256,
         "top_keywords": [
           "時間",
           "代步",
@@ -56,9 +57,9 @@
       },
       {
         "topic": "零件保修",
-        "count": 349,
-        "negative_ratio": 0.158,
-        "avg_risk": 0.236,
+        "count": 467,
+        "negative_ratio": 0.154,
+        "avg_risk": 0.264,
         "top_keywords": [
           "電池",
           "保固",
@@ -69,22 +70,22 @@
       },
       {
         "topic": "服務體驗",
-        "count": 199,
-        "negative_ratio": 0.111,
-        "avg_risk": 0.253,
+        "count": 279,
+        "negative_ratio": 0.104,
+        "avg_risk": 0.279,
         "top_keywords": [
           "體驗",
           "服務",
-          "溝通",
           "態度",
-          "安全感"
+          "專員",
+          "溝通"
         ]
       },
       {
         "topic": "產品品質",
-        "count": 164,
-        "negative_ratio": 0.14,
-        "avg_risk": 0.185,
+        "count": 212,
+        "negative_ratio": 0.142,
+        "avg_risk": 0.195,
         "top_keywords": [
           "油耗",
           "品質",
@@ -95,9 +96,9 @@
       },
       {
         "topic": "替代通路",
-        "count": 79,
-        "negative_ratio": 0.165,
-        "avg_risk": 0.424,
+        "count": 107,
+        "negative_ratio": 0.168,
+        "avg_risk": 0.433,
         "top_keywords": [
           "外廠",
           "外面",
@@ -107,9 +108,9 @@
       },
       {
         "topic": "回饋忠誠",
-        "count": 77,
-        "negative_ratio": 0.143,
-        "avg_risk": 0.191,
+        "count": 95,
+        "negative_ratio": 0.158,
+        "avg_risk": 0.206,
         "top_keywords": [
           "點數",
           "回饋",
@@ -122,38 +123,38 @@
     "top_risk_factors": [
       {
         "factor": "價格敏感",
-        "count": 379,
-        "share_pct": 23.1
+        "count": 447,
+        "share_pct": 23.0
       },
       {
         "factor": "明確流失意圖",
-        "count": 97,
-        "share_pct": 5.9
+        "count": 146,
+        "share_pct": 7.5
       },
       {
         "factor": "偏好替代保修通路",
-        "count": 93,
-        "share_pct": 5.7
+        "count": 132,
+        "share_pct": 6.8
       },
       {
         "factor": "時間與便利痛點",
-        "count": 75,
-        "share_pct": 4.6
+        "count": 109,
+        "share_pct": 5.6
       },
       {
         "factor": "關係與溝通裂痕",
-        "count": 29,
-        "share_pct": 1.8
+        "count": 41,
+        "share_pct": 2.1
       },
       {
         "factor": "問題解決信任危機",
-        "count": 21,
-        "share_pct": 1.3
+        "count": 37,
+        "share_pct": 1.9
       },
       {
         "factor": "保證期轉換風險",
-        "count": 8,
-        "share_pct": 0.5
+        "count": 21,
+        "share_pct": 1.1
       }
     ],
     "personas": [
@@ -162,7 +163,7 @@
         "name": "精算比價轉向者",
         "tagline": "保證將屆／已過，以價格與 TCO 決定是否離開原廠",
         "risk_level": "high",
-        "share_pct": 36.4,
+        "share_pct": 38.2,
         "demographics": {
           "車齡": "3–6 年／保證末期或剛過",
           "車款傾向": "RX / UX / IS 等主流車系",
@@ -190,7 +191,7 @@
         ],
         "representative_quotes": [
           "「Re: [閒聊] Lexus的NX ES能加裝通風椅了」— 手機排版請見諒，底下是車友之前在群組分享的截圖，車美仕這款通風椅應該是外廠開發回\n賣給和泰「原廠…",
-          "「Re: [問題] UX300H還是NX200?」— ※ 引述《kk60778 (撇海小英雄)》之銘言：\n: 各位萬能的版友好\n: 近期有換車需求，目…"
+          "「【影音試駕】Lexus RZ 550e F Sport，有趣加分！」— 播放影片\n提到Lexus你會想到什麼？豪華、高級、和風等形容詞相信都會在第一時間浮現在眼前，雖說…"
         ],
         "recommended_strategy": "用「權益保全 + 分期價值」取代單純折扣戰，強調準時定保延長保證、正廠零件保證與診斷能力。"
       },
@@ -199,7 +200,7 @@
         "name": "時間敏感體驗者",
         "tagline": "認同品牌服務，但被等待、缺料與行程摩擦推向外廠",
         "risk_level": "medium",
-        "share_pct": 3.8,
+        "share_pct": 4.0,
         "demographics": {
           "車齡": "1–4 年",
           "生活型態": "都會通勤、行程緊湊",
@@ -235,7 +236,7 @@
         "name": "信任與專業守護者",
         "tagline": "在意被理解與專業診斷，價格可接受但拒絕制式推銷",
         "risk_level": "medium",
-        "share_pct": 0.4,
+        "share_pct": 0.7,
         "demographics": {
           "車齡": "2–5 年",
           "關注點": "異音、電子系統、診斷正確性",
@@ -271,7 +272,7 @@
         "name": "尊榮體驗擁護者",
         "tagline": "高度認同取送車、救援與服務氛圍，是口碑擴散核心",
         "risk_level": "low",
-        "share_pct": 59.4,
+        "share_pct": 57.2,
         "demographics": {
           "車齡": "新車～3 年為主",
           "價值觀": "安全感、儀式感、品牌溫度",
@@ -305,6 +306,6 @@
       "Persona 分群：風險因子共現規則分群（可延伸為嵌入向量聚類）",
       "知識庫增強生成（RAG）：車主權益手冊結構化知識 → 溝通文案"
     ],
-    "executive_summary": "在 1642 則 Lexus 相關公開討論中，高流失風險內容約占 3.9%，平均流失風險指數 0.179。負面情緒主要集中於價格價值、零件保修與替代通路討論；正面聲量則來自取送車、道路救援與服務安全感。建議優先鎖定「精算比價轉向者」與時間摩擦型客群，以權益透明與便利接觸點進行攔截。"
+    "executive_summary": "在 1942 則 Lexus 相關公開討論中，高流失風險內容約占 5.3%，平均流失風險指數 0.191。負面情緒主要集中於價格價值、零件保修與替代通路討論；正面聲量則來自取送車、道路救援與服務安全感。建議優先鎖定「精算比價轉向者」與時間摩擦型客群，以權益透明與便利接觸點進行攔截。"
   }
 }

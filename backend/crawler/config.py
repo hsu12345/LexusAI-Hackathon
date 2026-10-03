@@ -46,7 +46,11 @@ class CrawlConfig:
     )
     # False = 收較多 Lexus 討論；True = 僅保留售後服務相關
     aftersales_only: bool = False
-    mobile01_forums: list[int] = field(default_factory=lambda: [267, 606, 264])
+    # 346 = LEXUS 看板（原本的 267 是重機、606 是 Audi）
+    mobile01_forums: list[int] = field(default_factory=lambda: [346])
+    # 看板列表每頁約 30 篇
+    mobile01_pages: int = 40
+    max_mobile01_articles: int = 300
     mobile01_search_keywords: list[str] = field(
         default_factory=lambda: ["lexus", "lexus 保養", "lexus 保修", "凌志"]
     )
@@ -58,6 +62,7 @@ class CrawlConfig:
             "lexus 原廠",
             "lexus",
             "凌志",
+            "凌志 保養",
             "ES300h",
             "RX350",
             "NX350h",
@@ -66,7 +71,9 @@ class CrawlConfig:
             "LM350h",
         ]
     )
-    max_dcard_articles: int = 60
+    max_dcard_articles: int = 200
+    # 每個關鍵字在搜尋頁往下捲動的次數
+    dcard_search_scrolls: int = 8
     # 每個 Dcard 看板往回翻的頁數（每頁 30 篇）
     dcard_forum_pages: int = 5
     dcard_headless: bool = False
