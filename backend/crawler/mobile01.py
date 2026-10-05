@@ -4,7 +4,7 @@ import random
 import re
 import time
 from dataclasses import dataclass
-from typing import Any, Iterator
+from typing import Any, Callable, Iterator
 from urllib.parse import urljoin
 
 from bs4 import BeautifulSoup
@@ -56,6 +56,13 @@ class Mobile01BrowserClient:
         except Exception:
             self._browser = self._playwright.chromium.launch(**launch_kwargs)
         self.page = self._browser.new_page(locale="zh-TW")
+        # 只需要文字：不載入圖片／影片／字型，Mobile01 頁面廣告圖多，可大幅縮短每頁載入時間
+        self.page.route(
+            "**/*",
+            lambda route: route.abort()
+            if route.request.resource_type in {"image", "media", "font"}
+            else route.continue_(),
+        )
         return self
 
     def __exit__(self, exc_type, exc, tb) -> None:
@@ -155,12 +162,18 @@ class Mobile01Crawler:
         if len(content) < 40:
             return None
 
+        # Lexus 專屬看板的文章本身就是 Lexus 討論（內文常只寫「這台」「保養」），不再做關鍵字篩選
         text = f"{title} {content}"
-        if not is_relevant(
+        in_lexus_forum = ref.forum_id in self.config.mobile01_lexus_forums
+        if not in_lexus_forum and not is_relevant(
             text,
             self.config.relevance_keywords,
             self.config.service_keywords,
             aftersales_only=self.config.aftersales_only,
+        ):
+            return None
+        if in_lexus_forum and self.config.aftersales_only and not is_relevant(
+            f"lexus {text}", self.config.relevance_keywords, self.config.service_keywords, aftersales_only=True
         ):
             return None
 
@@ -195,9 +208,15 @@ class Mobile01Crawler:
 
         return list(refs.values())
 
-    def crawl(self) -> list[dict]:
-        refs = self.collect_refs()
-        print(f"      [Mobile01] 候選文章 {len(refs)} 篇，最多抓取 {self.max_posts} 篇")
+    def crawl(
+        self,
+        skip_urls: set[str] | None = None,
+        checkpoint: Callable[[list[dict]], None] | None = None,
+    ) -> list[dict]:
+        """skip_urls：已抓過的文章網址，直接跳過；checkpoint：每 50 篇候選呼叫一次以先行存檔，中斷也不白跑。"""
+        skip_urls = skip_urls or set()
+        refs = [r for r in self.collect_refs() if urljoin(M01_BASE, r.href) not in skip_urls]
+        print(f"      [Mobile01] 候選文章 {len(refs)} 篇（已跳過抓過的），最多抓取 {self.max_posts} 篇")
         posts: list[dict] = []
         for i, ref in enumerate(refs, 1):
             if len(posts) >= self.max_posts:
@@ -207,4 +226,6 @@ class Mobile01Crawler:
                 posts.append(post)
             if i % 50 == 0:
                 print(f"      [Mobile01] 已處理 {i} 篇候選，保留 {len(posts)} 篇")
+                if checkpoint:
+                    checkpoint(posts)
         return posts

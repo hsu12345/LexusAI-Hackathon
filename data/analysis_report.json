@@ -1,32 +1,32 @@
 {
-  "analyzed_at": "2026-10-03T22:41:44+08:00",
+  "analyzed_at": "2026-10-05T23:30:45+08:00",
   "data_source": "crawled",
-  "post_count": 1942,
+  "post_count": 2741,
   "report": {
-    "total_posts": 1942,
+    "total_posts": 2741,
     "source_breakdown": {
       "PTT": 1500,
       "Dcard": 25,
-      "Threads": 117,
-      "Mobile01": 300
+      "Threads": 356,
+      "Mobile01": 860
     },
     "sentiment_breakdown": {
-      "negative": 236,
-      "positive": 672,
-      "neutral": 1034
+      "negative": 310,
+      "positive": 988,
+      "neutral": 1443
     },
     "risk_breakdown": {
-      "low": 1569,
-      "medium": 271,
-      "high": 102
+      "low": 2239,
+      "medium": 373,
+      "high": 129
     },
-    "avg_churn_risk": 0.191,
+    "avg_churn_risk": 0.182,
     "topic_insights": [
       {
         "topic": "價格價值",
-        "count": 977,
-        "negative_ratio": 0.162,
-        "avg_risk": 0.244,
+        "count": 1192,
+        "negative_ratio": 0.169,
+        "avg_risk": 0.249,
         "top_keywords": [
           "價格",
           "報價",
@@ -37,16 +37,29 @@
       },
       {
         "topic": "其他",
-        "count": 507,
-        "negative_ratio": 0.071,
-        "avg_risk": 0.095,
+        "count": 840,
+        "negative_ratio": 0.055,
+        "avg_risk": 0.093,
         "top_keywords": []
       },
       {
-        "topic": "便利性",
-        "count": 480,
-        "negative_ratio": 0.121,
+        "topic": "零件保修",
+        "count": 678,
+        "negative_ratio": 0.158,
         "avg_risk": 0.256,
+        "top_keywords": [
+          "電池",
+          "保固",
+          "維修",
+          "零件",
+          "故障"
+        ]
+      },
+      {
+        "topic": "便利性",
+        "count": 642,
+        "negative_ratio": 0.123,
+        "avg_risk": 0.246,
         "top_keywords": [
           "時間",
           "代步",
@@ -56,49 +69,36 @@
         ]
       },
       {
-        "topic": "零件保修",
-        "count": 467,
-        "negative_ratio": 0.154,
-        "avg_risk": 0.264,
-        "top_keywords": [
-          "電池",
-          "保固",
-          "維修",
-          "零件",
-          "HEV"
-        ]
-      },
-      {
         "topic": "服務體驗",
-        "count": 279,
-        "negative_ratio": 0.104,
-        "avg_risk": 0.279,
+        "count": 371,
+        "negative_ratio": 0.111,
+        "avg_risk": 0.267,
         "top_keywords": [
-          "體驗",
           "服務",
+          "體驗",
           "態度",
-          "專員",
-          "溝通"
+          "溝通",
+          "專員"
         ]
       },
       {
         "topic": "產品品質",
-        "count": 212,
-        "negative_ratio": 0.142,
+        "count": 308,
+        "negative_ratio": 0.146,
         "avg_risk": 0.195,
         "top_keywords": [
           "油耗",
           "品質",
           "車況",
-          "保值",
-          "模組"
+          "模組",
+          "保值"
         ]
       },
       {
         "topic": "替代通路",
-        "count": 107,
-        "negative_ratio": 0.168,
-        "avg_risk": 0.433,
+        "count": 160,
+        "negative_ratio": 0.169,
+        "avg_risk": 0.424,
         "top_keywords": [
           "外廠",
           "外面",
@@ -108,52 +108,52 @@
       },
       {
         "topic": "回饋忠誠",
-        "count": 95,
-        "negative_ratio": 0.158,
-        "avg_risk": 0.206,
+        "count": 117,
+        "negative_ratio": 0.145,
+        "avg_risk": 0.21,
         "top_keywords": [
           "點數",
           "回饋",
           "聯名",
-          "Points",
-          "禮遇"
+          "禮遇",
+          "升等"
         ]
       }
     ],
     "top_risk_factors": [
       {
         "factor": "價格敏感",
-        "count": 447,
-        "share_pct": 23.0
-      },
-      {
-        "factor": "明確流失意圖",
-        "count": 146,
-        "share_pct": 7.5
+        "count": 546,
+        "share_pct": 19.9
       },
       {
         "factor": "偏好替代保修通路",
-        "count": 132,
-        "share_pct": 6.8
+        "count": 188,
+        "share_pct": 6.9
+      },
+      {
+        "factor": "明確流失意圖",
+        "count": 185,
+        "share_pct": 6.7
       },
       {
         "factor": "時間與便利痛點",
-        "count": 109,
-        "share_pct": 5.6
-      },
-      {
-        "factor": "關係與溝通裂痕",
-        "count": 41,
-        "share_pct": 2.1
+        "count": 145,
+        "share_pct": 5.3
       },
       {
         "factor": "問題解決信任危機",
-        "count": 37,
-        "share_pct": 1.9
+        "count": 60,
+        "share_pct": 2.2
+      },
+      {
+        "factor": "關係與溝通裂痕",
+        "count": 58,
+        "share_pct": 2.1
       },
       {
         "factor": "保證期轉換風險",
-        "count": 21,
+        "count": 29,
         "share_pct": 1.1
       }
     ],
@@ -163,7 +163,7 @@
         "name": "精算比價轉向者",
         "tagline": "保證將屆／已過，以價格與 TCO 決定是否離開原廠",
         "risk_level": "high",
-        "share_pct": 38.2,
+        "share_pct": 34.3,
         "demographics": {
           "車齡": "3–6 年／保證末期或剛過",
           "車款傾向": "RX / UX / IS 等主流車系",
@@ -200,7 +200,7 @@
         "name": "時間敏感體驗者",
         "tagline": "認同品牌服務，但被等待、缺料與行程摩擦推向外廠",
         "risk_level": "medium",
-        "share_pct": 4.0,
+        "share_pct": 3.7,
         "demographics": {
           "車齡": "1–4 年",
           "生活型態": "都會通勤、行程緊湊",
@@ -236,7 +236,7 @@
         "name": "信任與專業守護者",
         "tagline": "在意被理解與專業診斷，價格可接受但拒絕制式推銷",
         "risk_level": "medium",
-        "share_pct": 0.7,
+        "share_pct": 1.0,
         "demographics": {
           "車齡": "2–5 年",
           "關注點": "異音、電子系統、診斷正確性",
@@ -262,8 +262,8 @@
           "被尊重的溝通"
         ],
         "representative_quotes": [
-          "「2026 Mazda CX30頂規版 vs. Lexus Ux300h豪華版？-首次購車女孩抉擇中🥺」— 煩惱-\n問題1:［車內異音比例高］：原本想買Mazda cx30了，但看到網路上滿多人說cx30…",
-          "「[問題] 請問LEXUS車主」— 請教各位前輩\n小弟的車是2018年式NX200\n在重踩油門時發現會出現異音\n這個聲音大概比引擎聲…"
+          "「我的UX250行駛時 不定時會產生異音~非個案」— 到目前前為止我的UX250行駛時 由原來的2種異音已新增到4種異音\n車子是在2023年3月交車,…",
+          "「[更新]Lexus品質不如預期!專注完美，竟是苛求!」— 入手Lexus RX270約一個月，想當初看上的也是所謂\"專注完美近乎苛求\"的廣告辭!\n不想再費…"
         ],
         "recommended_strategy": "以診斷透明度與專屬管家式溝通重建信任，再用原廠專用診斷與電池／電子系統保證作理性支撐。"
       },
@@ -272,7 +272,7 @@
         "name": "尊榮體驗擁護者",
         "tagline": "高度認同取送車、救援與服務氛圍，是口碑擴散核心",
         "risk_level": "low",
-        "share_pct": 57.2,
+        "share_pct": 61.0,
         "demographics": {
           "車齡": "新車～3 年為主",
           "價值觀": "安全感、儀式感、品牌溫度",
@@ -306,6 +306,6 @@
       "Persona 分群：風險因子共現規則分群（可延伸為嵌入向量聚類）",
       "知識庫增強生成（RAG）：車主權益手冊結構化知識 → 溝通文案"
     ],
-    "executive_summary": "在 1942 則 Lexus 相關公開討論中，高流失風險內容約占 5.3%，平均流失風險指數 0.191。負面情緒主要集中於價格價值、零件保修與替代通路討論；正面聲量則來自取送車、道路救援與服務安全感。建議優先鎖定「精算比價轉向者」與時間摩擦型客群，以權益透明與便利接觸點進行攔截。"
+    "executive_summary": "在 2741 則 Lexus 相關公開討論中，高流失風險內容約占 4.7%，平均流失風險指數 0.182。負面情緒主要集中於價格價值、零件保修與替代通路討論；正面聲量則來自取送車、道路救援與服務安全感。建議優先鎖定「精算比價轉向者」與時間摩擦型客群，以權益透明與便利接觸點進行攔截。"
   }
 }

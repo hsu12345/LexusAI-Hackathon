@@ -48,6 +48,8 @@ class CrawlConfig:
     aftersales_only: bool = False
     # 346 = LEXUS 看板（原本的 267 是重機、606 是 Audi）
     mobile01_forums: list[int] = field(default_factory=lambda: [346])
+    # Lexus 專屬看板：文章不需通過 Lexus 關鍵字篩選
+    mobile01_lexus_forums: list[int] = field(default_factory=lambda: [346])
     # 看板列表每頁約 30 篇
     mobile01_pages: int = 40
     max_mobile01_articles: int = 300
@@ -100,11 +102,32 @@ class CrawlConfig:
             "LBX",
             "LM350h",
             "IS300h",
+            "ES250",
+            "ES350",
+            "RX300",
+            "NX300",
+            "NX300h",
+            "NX450h",
+            "UX200",
+            "IS250",
+            "IS350",
+            "LS500h",
+            "LM300h",
+            "RZ450e",
+            "RZ",
+            "LX600",
+            "凌志保養",
+            "凌志原廠",
+            "凌志車主",
+            "Lexus保養",
+            "Lexus車主",
+            "和泰凌志",
+            "LEXUS凌志",
         ]
     )
     max_threads_articles: int = 200
     # 每個關鍵字搜尋結果往下捲動的次數，越多抓到的貼文越多
-    threads_scroll_rounds: int = 12
+    threads_scroll_rounds: int = 20
     # 實測 Threads 搜尋結果目前不需登入即可瀏覽，預設 headless 即可；
     # 若之後 Threads 又鎖回需登入，搭配 threads_require_login=True 使用
     threads_headless: bool = True
