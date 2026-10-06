@@ -3,6 +3,7 @@ const state = {
   posts: [],
   personas: [],
   plans: {},
+  llmAvailable: false,
 };
 
 const $ = (sel) => document.querySelector(sel);
@@ -21,12 +22,17 @@ function sentimentLabel(s) {
   return ({ positive: "正向", neutral: "中立", negative: "負向" }[s] || s);
 }
 
+function priorityLabel(p) {
+  return ({ high: "高優先", medium: "中優先", low: "低優先" }[p] || p);
+}
+
 function renderMetrics(report) {
+  const after = report.aftersales_insight || {};
   const items = [
     { label: "監測討論數", value: report.total_posts },
-    { label: "平均流失風險", value: report.avg_churn_risk.toFixed(2) },
+    { label: "售後相關討論", value: after.total_posts ?? "—" },
+    { label: "售後平均風險", value: after.avg_churn_risk != null ? after.avg_churn_risk.toFixed(2) : "—" },
     { label: "高風險占比", value: `${Math.round(100 * (report.risk_breakdown.high || 0) / report.total_posts)}%` },
-    { label: "Persona 數", value: report.personas.length },
   ];
   $("#metric-row").innerHTML = items.map((m) => `
     <div class="metric">
@@ -74,13 +80,16 @@ function renderTopics(report) {
 }
 
 function renderRiskFeed(posts) {
-  const top = [...posts].sort((a, b) => b.churn_risk_score - a.churn_risk_score).slice(0, 6);
+  const pool = posts.filter((p) => p.is_aftersales_focus).length
+    ? posts.filter((p) => p.is_aftersales_focus)
+    : posts;
+  const top = [...pool].sort((a, b) => b.churn_risk_score - a.churn_risk_score).slice(0, 8);
   $("#risk-feed").innerHTML = top.map((p) => `
     <div class="feed-item">
       <span class="badge ${p.risk_level}">${riskLabel(p.risk_level)}</span>
       <div>
         <strong>${p.title}</strong>
-        <div class="feed-meta">${p.source} · ${p.topics.join(" / ")} · ${(p.risk_factors || []).slice(0, 2).join("、") || "—"}</div>
+        <div class="feed-meta">${p.source} · 售後相關 ${(p.service_relevance_score || 0).toFixed(2)} · ${p.topics.join(" / ")} · ${(p.risk_factors || []).slice(0, 2).join("、") || "—"}</div>
       </div>
       <div class="score">${p.churn_risk_score.toFixed(2)}</div>
     </div>
@@ -118,24 +127,83 @@ function renderFactors(report) {
   $("#ai-methods").innerHTML = report.ai_methods.map((m) => `<li>${m}</li>`).join("");
 }
 
+function renderCitations(citations) {
+  if (!citations?.length) return "";
+  return `
+    <div class="kb-citations">
+      <strong>知識庫引用（RAG）</strong>
+      ${citations.map((c) => `
+        <div class="citation">
+          <span class="cite-id">${c.chunk_id}</span>
+          <span>${c.title}</span>
+          <p>${c.excerpt}…</p>
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+
 function renderComm(plan) {
+  const ir = plan.insight_response || {};
   $("#comm-plan").innerHTML = `
+    <article class="panel insight-link">
+      <h2>回應產出 1 洞察</h2>
+      <p class="lede">${ir.rationale || ""}</p>
+      <div class="insight-stats">
+        <span class="chip">討論數 ${ir.segment_post_count ?? "—"}</span>
+        <span class="chip">占比 ${ir.segment_share_pct ?? "—"}%</span>
+        <span class="chip">平均風險 ${ir.segment_avg_risk != null ? ir.segment_avg_risk.toFixed(2) : "—"}</span>
+        <span class="chip">高風險 ${ir.segment_high_risk_count ?? "—"} 則</span>
+      </div>
+      <div class="chips" style="margin-top:0.6rem">
+        ${(ir.linked_topics || []).map((t) => `<span class="chip">議題：${t}</span>`).join("")}
+        ${(ir.linked_risk_factors || []).map((f) => `<span class="chip warn">因子：${f}</span>`).join("")}
+      </div>
+    </article>
+
     <article class="panel">
-      <h2>${plan.persona_name}｜核心策略</h2>
+      <h2>${plan.persona_name}｜核心溝通策略</h2>
       <p class="lede">${plan.core_strategy}</p>
       <strong>目標</strong>
       <ul>${plan.objectives.map((o) => `<li>${o}</li>`).join("")}</ul>
-      <strong>接觸點</strong>
-      <div class="chips" style="margin:0.6rem 0 1rem">
-        ${plan.touchpoints.map((t) => `<span class="chip">${t.channel}：${t.purpose}</span>`).join("")}
+    </article>
+
+    <article class="panel">
+      <h2>精準接觸點規劃</h2>
+      <div class="touchpoint-table">
+        <table>
+          <thead>
+            <tr>
+              <th>通路</th><th>目的</th><th>觸發條件</th><th>時機</th><th>優先級</th><th>訊息主軸</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${(plan.touchpoint_timeline || []).map((t) => `
+              <tr>
+                <td>${t.channel}</td>
+                <td>${t.purpose}</td>
+                <td>${t.trigger}</td>
+                <td>${t.timing}</td>
+                <td><span class="badge ${t.priority === "high" ? "high" : t.priority === "medium" ? "medium" : "low"}">${priorityLabel(t.priority)}</span></td>
+                <td>${t.message_theme}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
       </div>
-      <strong>AI 生成內容範例</strong>
+    </article>
+
+    <article class="panel">
+      <h2>AI 生成內容範例</h2>
+      <p class="subtle">${plan.rag_enabled ? "由 RAG 检索車主權益手冊後生成" : "模板文案"}${plan.llm_available ? " · LLM 已就緒" : " · 離線 RAG 模式（未設定 API Key）"}</p>
       ${plan.contents.map((c) => `
         <div class="content-card">
-          <div class="channel-tag">${c.channel}</div>
+          <div class="channel-tag">${c.channel} · ${c.generation_method || "template"}</div>
+          ${c.trigger ? `<div class="meta-line">觸發：${c.trigger}｜時機：${c.timing || "—"}</div>` : ""}
           <h4>${c.title}</h4>
           <p>${c.body}</p>
           <div class="chips">${c.talking_points.map((t) => `<span class="chip">${t}</span>`).join("")}</div>
+          ${renderCitations(c.kb_citations)}
           <div class="cta">${c.cta}</div>
         </div>
       `).join("")}
@@ -144,19 +212,46 @@ function renderComm(plan) {
     </article>
   `;
 
-  $("#system-flow").innerHTML = plan.flow_steps.map((s) => `
+  renderFlow(plan);
+}
+
+function renderFlow(plan) {
+  $("#system-flow").innerHTML = (plan.flow_steps || []).map((s) => `
     <div class="flow-step">
       <div class="step">${s.step}</div>
       <p>${s.desc}</p>
     </div>
   `).join("");
+
+  const mermaidEl = $("#mermaid-flow");
+  if (mermaidEl && plan.flow_mermaid) {
+    mermaidEl.innerHTML = plan.flow_mermaid;
+    mermaidEl.removeAttribute("data-processed");
+    if (window.mermaid) {
+      mermaid.run({ nodes: [mermaidEl] }).catch(() => {
+        mermaidEl.textContent = plan.flow_mermaid;
+      });
+    }
+  }
 }
 
-async function loadComm(personaId) {
-  if (!state.plans[personaId]) {
-    state.plans[personaId] = await api(`/api/communication/${personaId}`);
+async function loadComm(personaId, { useLlm = false, force = false } = {}) {
+  const cacheKey = `${personaId}:${useLlm ? "llm" : "rag"}`;
+  if (!force && state.plans[cacheKey]) {
+    renderComm(state.plans[cacheKey]);
+    return;
   }
-  renderComm(state.plans[personaId]);
+
+  if (useLlm) {
+    state.plans[cacheKey] = await api("/api/communication/generate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ persona_id: personaId, use_llm: true, use_rag: true }),
+    });
+  } else {
+    state.plans[cacheKey] = await api(`/api/communication/${personaId}`);
+  }
+  renderComm(state.plans[cacheKey]);
 }
 
 function bindNav() {
@@ -172,14 +267,31 @@ function bindNav() {
 
 async function init() {
   bindNav();
-  const data = await api("/api/analyze", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ use_sample: true }),
-  });
+  if (window.mermaid) {
+    mermaid.initialize({ startOnLoad: false, theme: "neutral", securityLevel: "loose" });
+  }
+
+  const [health, data] = await Promise.all([
+    api("/api/health"),
+    api("/api/dashboard"),
+  ]);
+
+  state.llmAvailable = health.llm_available;
   state.report = data.report;
   state.posts = data.posts;
   state.personas = data.report.personas;
+
+  const statusEl = $("#llm-status");
+  if (statusEl) {
+    statusEl.textContent = health.llm_available
+      ? "LLM 已就緒"
+      : "離線 RAG（設定 OPENAI_API_KEY 可啟用 LLM）";
+    statusEl.className = `llm-status ${health.llm_available ? "ok" : ""}`;
+  }
+  const llmBtn = $("#btn-llm");
+  if (llmBtn && !health.llm_available) {
+    llmBtn.disabled = true;
+  }
 
   $("#executive-summary").textContent = data.report.executive_summary;
   renderMetrics(data.report);
@@ -192,6 +304,16 @@ async function init() {
   const first = data.report.personas[0]?.id || "price_switcher";
   $("#persona-select").value = first;
   $("#persona-select").addEventListener("change", (e) => loadComm(e.target.value));
+
+  $("#btn-rag")?.addEventListener("click", () => {
+    const id = $("#persona-select").value;
+    loadComm(id, { force: true });
+  });
+  $("#btn-llm")?.addEventListener("click", () => {
+    const id = $("#persona-select").value;
+    loadComm(id, { useLlm: true, force: true });
+  });
+
   await loadComm(first);
 }
 

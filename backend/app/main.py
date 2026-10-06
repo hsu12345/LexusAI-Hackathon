@@ -8,8 +8,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from .models import AnalyzeRequest, GenerateCommRequest
-from .services.communication import generate_plan, load_kb
+from .models import AnalyzeRequest, AnalyzedPost, GenerateCommRequest
+from .services.analysis_runner import load_cached_analysis
+from .services.communication import generate_plan
+from .services.rag import load_kb, llm_available
 from .services.insight import build_market_report, build_personas
 from .services.nlp_analyzer import analyze_posts
 
@@ -45,6 +47,23 @@ def _data_source() -> str:
     return "sample"
 
 
+_analyzed_cache: list[AnalyzedPost] | None = None
+
+
+def _get_analyzed_posts(*, refresh: bool = False) -> list[AnalyzedPost]:
+    global _analyzed_cache
+    if _analyzed_cache is not None and not refresh:
+        return _analyzed_cache
+
+    cached = load_cached_analysis()
+    if cached and not refresh:
+        _analyzed_cache = [AnalyzedPost(**p) for p in cached["posts"]]
+        return _analyzed_cache
+
+    _analyzed_cache = analyze_posts(_load_posts())
+    return _analyzed_cache
+
+
 @app.get("/api/health")
 def health():
     meta_path = ROOT / "data" / "crawl_meta.json"
@@ -58,6 +77,8 @@ def health():
         "data_source": _data_source(),
         "post_count": len(_load_posts()),
         "crawl_meta": meta,
+        "llm_available": llm_available(),
+        "rag_enabled": True,
     }
 
 
@@ -66,54 +87,78 @@ def knowledge():
     return load_kb()
 
 
+@app.get("/api/dashboard")
+def dashboard():
+    """Fast dashboard payload — reads cached analysis when available."""
+    cached = load_cached_analysis()
+    if cached:
+        return cached
+    analyzed = _get_analyzed_posts(refresh=True)
+    report = build_market_report(analyzed)
+    return {
+        "analyzed_at": None,
+        "data_source": _data_source(),
+        "post_count": len(analyzed),
+        "posts": [p.model_dump() for p in analyzed],
+        "report": report.model_dump(),
+        "cached": False,
+    }
+
+
 @app.post("/api/analyze")
 def analyze(req: AnalyzeRequest):
     posts = _load_posts() if req.use_sample or not req.posts else req.posts
-    analyzed = analyze_posts(posts)
-    report = build_market_report(analyzed)
+    global _analyzed_cache
+    _analyzed_cache = analyze_posts(posts)
+    report = build_market_report(_analyzed_cache)
     return {
-        "posts": [p.model_dump() for p in analyzed],
+        "posts": [p.model_dump() for p in _analyzed_cache],
         "report": report.model_dump(),
     }
 
 
 @app.get("/api/report")
 def report():
-    analyzed = analyze_posts(_load_posts())
-    return build_market_report(analyzed).model_dump()
+    cached = load_cached_analysis()
+    if cached:
+        return cached["report"]
+    return build_market_report(_get_analyzed_posts()).model_dump()
 
 
 @app.get("/api/posts")
 def posts():
-    analyzed = analyze_posts(_load_posts())
-    return [p.model_dump() for p in analyzed]
+    return [p.model_dump() for p in _get_analyzed_posts()]
 
 
 @app.get("/api/personas")
 def personas():
-    analyzed = analyze_posts(_load_posts())
-    return [p.model_dump() for p in build_personas(analyzed)]
+    return [p.model_dump() for p in build_personas(_get_analyzed_posts())]
 
 
 @app.post("/api/communication/generate")
 def communication_generate(req: GenerateCommRequest):
-    analyzed = analyze_posts(_load_posts())
+    analyzed = _get_analyzed_posts()
     personas = build_personas(analyzed)
     persona = next((p for p in personas if p.id == req.persona_id), None)
     if not persona:
         raise HTTPException(status_code=404, detail="Persona not found")
-    plan = generate_plan(persona, use_llm=req.use_llm)
+    plan = generate_plan(
+        persona,
+        posts=analyzed,
+        use_llm=req.use_llm,
+        use_rag=req.use_rag,
+    )
     return plan.model_dump()
 
 
 @app.get("/api/communication/{persona_id}")
-def communication_get(persona_id: str):
-    analyzed = analyze_posts(_load_posts())
+def communication_get(persona_id: str, use_llm: bool = False):
+    analyzed = _get_analyzed_posts()
     personas = build_personas(analyzed)
     persona = next((p for p in personas if p.id == persona_id), None)
     if not persona:
         raise HTTPException(status_code=404, detail="Persona not found")
-    return generate_plan(persona).model_dump()
+    return generate_plan(persona, posts=analyzed, use_llm=use_llm).model_dump()
 
 
 @app.get("/")

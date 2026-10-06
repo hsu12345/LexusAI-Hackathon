@@ -47,6 +47,8 @@ class AnalyzedPost(BaseModel):
     alternative_preference: list[str] = Field(default_factory=list)
     model_hint: str | None = None
     tenure_hint: str | None = None
+    service_relevance_score: float = 0.0
+    is_aftersales_focus: bool = False
 
 
 class PersonaProfile(BaseModel):
@@ -72,6 +74,14 @@ class TopicInsight(BaseModel):
     top_keywords: list[str]
 
 
+class AftersalesInsight(BaseModel):
+    total_posts: int
+    share_pct: float
+    avg_churn_risk: float
+    risk_breakdown: dict[str, int]
+    sentiment_breakdown: dict[str, int]
+
+
 class MarketInsightReport(BaseModel):
     total_posts: int
     source_breakdown: dict[str, int]
@@ -83,6 +93,40 @@ class MarketInsightReport(BaseModel):
     personas: list[PersonaProfile]
     ai_methods: list[str]
     executive_summary: str
+    aftersales_insight: AftersalesInsight | None = None
+    risk_thresholds: dict[str, float] = Field(default_factory=dict)
+
+
+class KBCitation(BaseModel):
+    chunk_id: str
+    title: str
+    excerpt: str
+
+
+class TouchpointPlan(BaseModel):
+    channel: str
+    purpose: str
+    trigger: str
+    timing: str
+    priority: str
+    message_theme: str
+
+
+class InsightResponse(BaseModel):
+    linked_topics: list[str]
+    linked_risk_factors: list[str]
+    segment_post_count: int
+    segment_share_pct: float
+    segment_avg_risk: float
+    segment_high_risk_count: int
+    rationale: str
+
+
+class FlowNode(BaseModel):
+    id: str
+    label: str
+    description: str
+    layer: str
 
 
 class CommunicationContent(BaseModel):
@@ -94,6 +138,10 @@ class CommunicationContent(BaseModel):
     cta: str
     talking_points: list[str]
     value_proof: list[str]
+    kb_citations: list[KBCitation] = Field(default_factory=list)
+    generation_method: str = "template"
+    trigger: str | None = None
+    timing: str | None = None
 
 
 class CommunicationPlan(BaseModel):
@@ -102,9 +150,15 @@ class CommunicationPlan(BaseModel):
     core_strategy: str
     objectives: list[str]
     touchpoints: list[dict[str, str]]
+    touchpoint_timeline: list[TouchpointPlan]
+    insight_response: InsightResponse
     contents: list[CommunicationContent]
     kpi: list[str]
     flow_steps: list[dict[str, str]]
+    flow_nodes: list[FlowNode]
+    flow_mermaid: str
+    llm_available: bool = False
+    rag_enabled: bool = True
 
 
 class AnalyzeRequest(BaseModel):
@@ -115,3 +169,4 @@ class AnalyzeRequest(BaseModel):
 class GenerateCommRequest(BaseModel):
     persona_id: str
     use_llm: bool = False
+    use_rag: bool = True

@@ -58,3 +58,21 @@ def run_analysis(save: bool = True) -> dict[str, Any]:
             )
 
     return result
+
+
+def load_cached_analysis() -> dict[str, Any] | None:
+    """Return pre-computed analysis from disk (fast path for dashboard)."""
+    if not ANALYZED_PATH.exists() or not REPORT_PATH.exists():
+        return None
+    with ANALYZED_PATH.open(encoding="utf-8") as f:
+        posts = json.load(f)
+    with REPORT_PATH.open(encoding="utf-8") as f:
+        meta = json.load(f)
+    return {
+        "analyzed_at": meta.get("analyzed_at"),
+        "data_source": meta.get("data_source"),
+        "post_count": meta.get("post_count", len(posts)),
+        "posts": posts,
+        "report": meta["report"],
+        "cached": True,
+    }

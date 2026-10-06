@@ -45,7 +45,7 @@
         </article>
       </div>
       <article class="panel">
-        <h2>最新高風險討論</h2>
+        <h2>售後服務高風險討論</h2>
         <div id="risk-feed" class="feed"></div>
       </article>
     </section>
@@ -85,6 +85,9 @@
       <div class="comm-controls">
         <label for="persona-select">選擇 Persona</label>
         <select id="persona-select"></select>
+        <button type="button" id="btn-rag" class="btn-secondary">RAG 重新生成</button>
+        <button type="button" id="btn-llm" class="btn-primary" title="需設定 OPENAI_API_KEY">RAG + LLM 生成</button>
+        <span id="llm-status" class="llm-status"></span>
       </div>
       <div id="comm-plan"></div>
     </section>
@@ -93,6 +96,10 @@
       <div class="section-head">
         <p class="eyebrow">系統架構</p>
         <h1>AI 方案運作流程</h1>
+      </div>
+      <div class="flow-diagram panel">
+        <h2>運作流程圖</h2>
+        <div id="mermaid-flow" class="mermaid-wrap"></div>
       </div>
       <div class="flow" id="system-flow"></div>
       <article class="panel arch">
@@ -111,6 +118,7 @@
     <span>LexusAI Hackathon MVP</span>
     <span>目標使用者：Lexus 售後服務部門決策者</span>
   </footer>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
   <script src="/static/app.js"></script>
 </body>
 </html>

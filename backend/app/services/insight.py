@@ -2,8 +2,11 @@ from __future__ import annotations
 
 from collections import Counter, defaultdict
 
-from .nlp_analyzer import topic_keyword_stats
+import numpy as np
+
+from .nlp_analyzer import RISK_LEVEL_HIGH_PCT, RISK_LEVEL_MEDIUM_PCT, topic_keyword_stats
 from ..models import (
+    AftersalesInsight,
     AnalyzedPost,
     MarketInsightReport,
     PersonaProfile,
@@ -17,12 +20,11 @@ PERSONA_TEMPLATES: list[dict] = [
         "id": "price_switcher",
         "name": "精算比價轉向者",
         "tagline": "保證將屆／已過，以價格與 TCO 決定是否離開原廠",
-        "match_any_factors": {"價格敏感", "保證期轉換風險", "偏好替代保修通路", "明確流失意圖"},
         "risk_level": RiskLevel.high,
         "demographics": {
             "車齡": "3–6 年／保證末期或剛過",
             "車款傾向": "RX / UX / IS 等主流車系",
-            "資訊管道": "PTT、Mobile01 價格討論串",
+            "資訊管道": "PTT、Threads 價格討論",
             "決策風格": "數據導向、會算五年持有成本",
         },
         "needs": ["透明且可比較的報價", "耗材與定保的彈性方案", "保證權益不受影響的清楚說明"],
@@ -35,7 +37,6 @@ PERSONA_TEMPLATES: list[dict] = [
         "id": "time_friction",
         "name": "時間敏感體驗者",
         "tagline": "認同品牌服務，但被等待、缺料與行程摩擦推向外廠",
-        "match_any_factors": {"時間與便利痛點", "關係與溝通裂痕"},
         "risk_level": RiskLevel.medium,
         "demographics": {
             "車齡": "1–4 年",
@@ -53,7 +54,6 @@ PERSONA_TEMPLATES: list[dict] = [
         "id": "trust_seeker",
         "name": "信任與專業守護者",
         "tagline": "在意被理解與專業診斷，價格可接受但拒絕制式推銷",
-        "match_any_factors": {"問題解決信任危機", "關係與溝通裂痕"},
         "risk_level": RiskLevel.medium,
         "demographics": {
             "車齡": "2–5 年",
@@ -71,12 +71,11 @@ PERSONA_TEMPLATES: list[dict] = [
         "id": "loyalty_advocate",
         "name": "尊榮體驗擁護者",
         "tagline": "高度認同取送車、救援與服務氛圍，是口碑擴散核心",
-        "match_any_factors": set(),
         "risk_level": RiskLevel.low,
         "demographics": {
             "車齡": "新車～3 年為主",
             "價值觀": "安全感、儀式感、品牌溫度",
-            "活躍管道": "Dcard 心得、社群分享",
+            "活躍管道": "Dcard / Threads 心得分享",
             "決策風格": "體驗優先，價格次之",
         },
         "needs": ["持續被看見的尊榮感", "生活風格活動與內容", "數位權益提醒（非硬推銷）"],
@@ -87,35 +86,105 @@ PERSONA_TEMPLATES: list[dict] = [
     },
 ]
 
+PERSONA_SIGNALS: dict[str, dict[str, float]] = {
+    "price_switcher": {
+        "topic:價格價值": 1.4,
+        "topic:替代通路": 1.3,
+        "topic:零件保修": 0.8,
+        "factor:價格敏感": 1.6,
+        "factor:保證期轉換風險": 1.4,
+        "factor:偏好替代保修通路": 1.5,
+        "factor:明確流失意圖": 1.8,
+        "risk_score": 1.0,
+    },
+    "time_friction": {
+        "topic:便利性": 1.6,
+        "topic:服務體驗": 1.0,
+        "factor:時間與便利痛點": 1.8,
+        "factor:關係與溝通裂痕": 0.8,
+        "risk_score": 0.7,
+    },
+    "trust_seeker": {
+        "topic:服務體驗": 1.2,
+        "topic:產品品質": 1.0,
+        "topic:零件保修": 0.9,
+        "factor:問題解決信任危機": 1.8,
+        "factor:關係與溝通裂痕": 1.2,
+        "sentiment:negative": 0.8,
+        "risk_score": 0.75,
+    },
+    "loyalty_advocate": {
+        "topic:回饋忠誠": 1.2,
+        "topic:便利性": 0.8,
+        "topic:服務體驗": 0.9,
+        "sentiment:positive": 1.4,
+        "service_relevance": 0.6,
+        "risk_score": -0.8,
+    },
+}
+
+
+def _persona_feature_vector(post: AnalyzedPost) -> dict[str, float]:
+    features: dict[str, float] = {
+        "risk_score": post.churn_risk_score,
+        "service_relevance": post.service_relevance_score,
+        f"sentiment:{post.sentiment.value}": 1.0,
+    }
+    for topic in post.topics:
+        features[f"topic:{topic}"] = 1.0
+    for factor in post.risk_factors:
+        features[f"factor:{factor}"] = 1.0
+    return features
+
 
 def _assign_persona(post: AnalyzedPost) -> str:
-    factor_set = set(post.risk_factors)
+    features = _persona_feature_vector(post)
     best_id = "loyalty_advocate"
-    best_score = -1
+    best_score = -999.0
+
     for tpl in PERSONA_TEMPLATES:
-        keys = tpl["match_any_factors"]
-        if not keys:
-            # fallback low-risk positive/neutral
-            score = 1 if post.risk_level == RiskLevel.low and post.sentiment.value != "negative" else 0
-        else:
-            score = len(factor_set & keys)
-            if post.risk_level == RiskLevel.high and tpl["risk_level"] == RiskLevel.high:
-                score += 1
+        persona_id = tpl["id"]
+        weights = PERSONA_SIGNALS[persona_id]
+        score = 0.0
+        for key, weight in weights.items():
+            if key in features:
+                score += features[key] * weight
+        if post.is_aftersales_focus:
+            score += 0.15
+        if persona_id == "loyalty_advocate" and post.risk_level == RiskLevel.low:
+            score += 0.25
         if score > best_score:
             best_score = score
-            best_id = tpl["id"]
+            best_id = persona_id
     return best_id
 
 
-def build_personas(posts: list[AnalyzedPost]) -> list[PersonaProfile]:
+def get_persona_posts(posts: list[AnalyzedPost], persona_id: str) -> list[AnalyzedPost]:
+    aftersales = [p for p in posts if _assign_persona(p) == persona_id and p.is_aftersales_focus]
+    if aftersales:
+        return aftersales
+    return [p for p in posts if _assign_persona(p) == persona_id]
+
+
+def build_personas(posts: list[AnalyzedPost], *, aftersales_only: bool = False) -> list[PersonaProfile]:
+    pool = [p for p in posts if p.is_aftersales_focus] if aftersales_only else posts
+    if not pool:
+        pool = posts
+
     buckets: dict[str, list[AnalyzedPost]] = defaultdict(list)
-    for p in posts:
+    for p in pool:
         buckets[_assign_persona(p)].append(p)
 
-    total = max(len(posts), 1)
+    total = max(len(pool), 1)
     personas: list[PersonaProfile] = []
     for tpl in PERSONA_TEMPLATES:
         group = buckets.get(tpl["id"], [])
+        top_posts = sorted(group, key=lambda x: x.churn_risk_score, reverse=True)
+        quotes = [
+            f"「{g.title}」— {g.content[:56].replace(chr(10), ' ')}…"
+            for g in top_posts[:2]
+            if g.content or g.title
+        ]
         personas.append(
             PersonaProfile(
                 id=tpl["id"],
@@ -128,14 +197,50 @@ def build_personas(posts: list[AnalyzedPost]) -> list[PersonaProfile]:
                 pain_points=tpl["pain_points"],
                 preferred_alternatives=tpl["preferred_alternatives"],
                 key_considerations=tpl["key_considerations"],
-                representative_quotes=[
-                    f"「{g.title}」— {g.content[:48]}…"
-                    for g in sorted(group, key=lambda x: x.churn_risk_score, reverse=True)[:2]
-                ] or ["（此 Persona 在目前樣本中樣本較少，採規則模板描繪）"],
+                representative_quotes=quotes or ["（此 Persona 在目前樣本中較少，採模板描繪）"],
                 recommended_strategy=tpl["recommended_strategy"],
             )
         )
     return personas
+
+
+def _aftersales_insight(posts: list[AnalyzedPost]) -> AftersalesInsight:
+    subset = [p for p in posts if p.is_aftersales_focus]
+    total = max(len(posts), 1)
+    if not subset:
+        return AftersalesInsight(
+            total_posts=0,
+            share_pct=0.0,
+            avg_churn_risk=0.0,
+            risk_breakdown={},
+            sentiment_breakdown={},
+        )
+    return AftersalesInsight(
+        total_posts=len(subset),
+        share_pct=round(100 * len(subset) / total, 1),
+        avg_churn_risk=round(sum(p.churn_risk_score for p in subset) / len(subset), 3),
+        risk_breakdown=dict(Counter(p.risk_level.value for p in subset)),
+        sentiment_breakdown=dict(Counter(p.sentiment.value for p in subset)),
+    )
+
+
+def _executive_summary(posts: list[AnalyzedPost], personas: list[PersonaProfile], aftersales: AftersalesInsight) -> str:
+    high = sum(1 for p in posts if p.risk_level == RiskLevel.high)
+    aftersales_high = sum(
+        1 for p in posts if p.is_aftersales_focus and p.risk_level == RiskLevel.high
+    )
+    top_persona = max(personas, key=lambda x: x.share_pct)
+    top_topic = Counter(t for p in posts if p.is_aftersales_focus for t in p.topics).most_common(1)
+    topic_name = top_topic[0][0] if top_topic else "價格價值"
+
+    return (
+        f"已分析 {len(posts)} 則 Lexus 相關討論，其中售後服務相關 {aftersales.total_posts} 則（{aftersales.share_pct}%）。"
+        f"整體高流失風險占 {round(100 * high / max(len(posts), 1), 1)}%，"
+        f"售後子集高風險 {aftersales_high} 則、平均風險 {aftersales.avg_churn_risk}。"
+        f"售後輿情最熱議題為「{topic_name}」，"
+        f"最大 Persona 為「{top_persona.name}」（{top_persona.share_pct}%）。"
+        f"建議優先針對高風險售後討論設計攔截溝通，並強化原廠價值與便利服務的差異化訊息。"
+    )
 
 
 def build_market_report(posts: list[AnalyzedPost]) -> MarketInsightReport:
@@ -144,17 +249,20 @@ def build_market_report(posts: list[AnalyzedPost]) -> MarketInsightReport:
     risk_breakdown = dict(Counter(p.risk_level.value for p in posts))
     avg_risk = round(sum(p.churn_risk_score for p in posts) / max(len(posts), 1), 3)
 
+    aftersales_posts = [p for p in posts if p.is_aftersales_focus]
+    topic_pool = aftersales_posts or posts
+
     topic_counter: Counter[str] = Counter()
     topic_neg: Counter[str] = Counter()
     topic_risk: dict[str, list[float]] = defaultdict(list)
-    for p in posts:
+    for p in topic_pool:
         for t in p.topics:
             topic_counter[t] += 1
             topic_risk[t].append(p.churn_risk_score)
             if p.sentiment.value == "negative":
                 topic_neg[t] += 1
 
-    kw = topic_keyword_stats(posts)
+    kw = topic_keyword_stats(topic_pool)
     topic_insights = [
         TopicInsight(
             topic=topic,
@@ -166,21 +274,21 @@ def build_market_report(posts: list[AnalyzedPost]) -> MarketInsightReport:
         for topic, count in topic_counter.most_common()
     ]
 
-    factor_counter = Counter(f for p in posts for f in p.risk_factors)
+    factor_counter = Counter(f for p in aftersales_posts for f in p.risk_factors)
     top_risk_factors = [
-        {"factor": k, "count": v, "share_pct": round(100 * v / max(len(posts), 1), 1)}
+        {"factor": k, "count": v, "share_pct": round(100 * v / max(len(aftersales_posts), 1), 1)}
         for k, v in factor_counter.most_common(8)
     ]
 
-    personas = build_personas(posts)
-    high = risk_breakdown.get("high", 0)
-    executive = (
-        f"在 {len(posts)} 則 Lexus 相關公開討論中，高流失風險內容約占 {round(100*high/max(len(posts),1),1)}%，"
-        f"平均流失風險指數 {avg_risk}。"
-        f"負面情緒主要集中於價格價值、零件保修與替代通路討論；"
-        f"正面聲量則來自取送車、道路救援與服務安全感。"
-        f"建議優先鎖定「{personas[0].name}」與時間摩擦型客群，以權益透明與便利接觸點進行攔截。"
-    )
+    personas = build_personas(posts, aftersales_only=True)
+    aftersales = _aftersales_insight(posts)
+    scores = [p.churn_risk_score for p in posts]
+    thresholds = {
+        "high_percentile": RISK_LEVEL_HIGH_PCT,
+        "medium_percentile": RISK_LEVEL_MEDIUM_PCT,
+        "high_cut": round(float(np.percentile(scores, RISK_LEVEL_HIGH_PCT)), 3),
+        "medium_cut": round(float(np.percentile(scores, RISK_LEVEL_MEDIUM_PCT)), 3),
+    }
 
     return MarketInsightReport(
         total_posts=len(posts),
@@ -191,12 +299,15 @@ def build_market_report(posts: list[AnalyzedPost]) -> MarketInsightReport:
         topic_insights=topic_insights,
         top_risk_factors=top_risk_factors,
         personas=personas,
+        aftersales_insight=aftersales,
+        risk_thresholds=thresholds,
         ai_methods=[
-            "中文詞典規則 + 正負向詞彙計分之情緒分析（可替換為 Transformer 中文情緒模型）",
-            "多標籤主題分類（服務體驗／零件保修／價格價值／便利性／回饋忠誠／替代通路）",
-            "流失風險評分模型（意圖、價格敏感、保證轉換、便利摩擦、信任裂痕加權）",
-            "Persona 分群：風險因子共現規則分群（可延伸為嵌入向量聚類）",
-            "知識庫增強生成（RAG）：車主權益手冊結構化知識 → 溝通文案",
+            "jieba 中文分詞 + TF-IDF 向量與主題原型 cosine 相似度（混合詞典加權）",
+            "否定詞與程度副詞修飾的情緒分析（非單純詞頻計分）",
+            "售後服務相關度模型：品牌 × 保修關鍵字 − 購車雜訊懲罰",
+            "流失風險：規則因子 + 情緒 + 互動熱度 + 動態分位數分級（P70/P90）",
+            "Persona：多特徵加權匹配（主題、風險因子、情緒、售後相關度）",
+            "知識庫增強生成（RAG）：車主權益手冊 → 溝通文案",
         ],
-        executive_summary=executive,
+        executive_summary=_executive_summary(posts, personas, aftersales),
     )

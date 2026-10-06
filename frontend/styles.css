@@ -263,10 +263,72 @@ th { color: var(--muted); font-weight: 500; font-size: 0.8rem; }
 
 .comm-controls {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.8rem;
   align-items: center;
   margin-bottom: 1rem;
 }
+.btn-primary, .btn-secondary {
+  font: inherit;
+  padding: 0.55rem 0.9rem;
+  border-radius: 999px;
+  cursor: pointer;
+  border: 1px solid var(--line);
+}
+.btn-primary {
+  background: var(--ink);
+  color: #fff;
+  border-color: var(--ink);
+}
+.btn-primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.btn-secondary {
+  background: #fffef9;
+  color: var(--ink);
+}
+.llm-status {
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+.llm-status.ok { color: var(--ok); }
+.subtle { color: var(--muted); font-size: 0.9rem; margin: 0 0 1rem; }
+.insight-stats { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.chip.warn { border-color: rgba(154, 107, 47, 0.35); color: var(--warn); }
+.meta-line { font-size: 0.82rem; color: var(--muted); margin-bottom: 0.35rem; }
+.kb-citations {
+  margin-top: 0.8rem;
+  padding: 0.8rem;
+  background: rgba(154, 123, 79, 0.06);
+  border-left: 3px solid var(--accent);
+}
+.kb-citations .citation { margin-top: 0.5rem; font-size: 0.88rem; }
+.kb-citations .cite-id {
+  font-family: monospace;
+  font-size: 0.75rem;
+  color: var(--accent-deep);
+  margin-right: 0.4rem;
+}
+.kb-citations p { margin: 0.2rem 0 0; color: var(--muted); }
+.touchpoint-table { overflow-x: auto; }
+.touchpoint-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+.touchpoint-table th, .touchpoint-table td {
+  border-bottom: 1px solid var(--line);
+  padding: 0.55rem 0.4rem;
+  text-align: left;
+  vertical-align: top;
+}
+.touchpoint-table th { color: var(--muted); font-weight: 500; }
+.mermaid-wrap {
+  overflow-x: auto;
+  padding: 0.5rem 0;
+}
+.flow-diagram { margin-bottom: 1rem; }
 select {
   font: inherit;
   padding: 0.55rem 0.8rem;
