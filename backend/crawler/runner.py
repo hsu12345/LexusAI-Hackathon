@@ -7,7 +7,7 @@ from typing import Any
 
 from .config import CrawlConfig
 from .http_client import RateLimitedClient
-from .mobile01 import Mobile01Crawler
+from .mobile01 import Mobile01BrowserClient, Mobile01Crawler
 from .normalizer import dedupe_posts, normalize_post
 from .ptt import PttCrawler
 
@@ -15,6 +15,28 @@ ROOT = Path(__file__).resolve().parents[2]
 DATA_DIR = ROOT / "data"
 CRAWLED_PATH = DATA_DIR / "crawled_posts.json"
 META_PATH = DATA_DIR / "crawl_meta.json"
+
+
+def _existing_urls() -> set[str]:
+    try:
+        with CRAWLED_PATH.open(encoding="utf-8") as f:
+            return {p.get("url") for p in json.load(f) if p.get("url")}
+    except Exception:
+        return set()
+
+
+def _checkpoint(raw_posts: list[dict]) -> None:
+    """把目前抓到的文章先合併寫入 crawled_posts.json（不跑分析），避免長時間爬取中斷後全部遺失。"""
+    try:
+        with CRAWLED_PATH.open(encoding="utf-8") as f:
+            existing = json.load(f)
+    except Exception:
+        existing = []
+    merged = dedupe_posts(existing + [normalize_post(p) for p in raw_posts])
+    tmp = CRAWLED_PATH.with_suffix(".tmp")
+    with tmp.open("w", encoding="utf-8") as f:
+        json.dump(merged, f, ensure_ascii=False, indent=2)
+    tmp.replace(CRAWLED_PATH)
 
 
 def run_crawl(
@@ -46,8 +68,11 @@ def run_crawl(
     if include_mobile01:
         print(f"[{step}/{total_steps}] 開始爬取 Mobile01…")
         try:
-            m01 = Mobile01Crawler(client, config)
-            m01_raw = m01.crawl()
+            # Mobile01 會 403 拒絕 requests，改用一般瀏覽器讀取
+            with Mobile01BrowserClient(config) as browser:
+                m01_raw = Mobile01Crawler(browser, config).crawl(
+                    skip_urls=_existing_urls(), checkpoint=_checkpoint
+                )
             print(f"      Mobile01 取得 {len(m01_raw)} 篇")
         except Exception as exc:
             print(f"      Mobile01 跳過：{exc}")

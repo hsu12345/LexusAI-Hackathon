@@ -28,6 +28,7 @@ Desktop.ini
 # 爬蟲 session（含登入狀態，勿分享）
 data/dcard_cookies.json
 data/threads_cookies.json
+data/*_cookies.json.bak
 
 # 暫存 / 診斷
 data/dcard_probe*.json

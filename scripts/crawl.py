@@ -49,9 +49,10 @@ def main() -> None:
         help="Threads 使用可見瀏覽器（除錯用，或搭配 --threads-require-login 手動登入）",
     )
     parser.add_argument("--aftersales-only", action="store_true", help="僅保留售後服務相關文章")
-    parser.add_argument("--max-articles", type=int, default=500, help="PTT 最多抓取篇數（Mobile01 為其 1/4）")
+    parser.add_argument("--max-articles", type=int, default=500, help="PTT 最多抓取篇數")
     parser.add_argument("--ptt-search-pages", type=int, default=30, help="PTT 每個關鍵字搜尋頁數（每頁 20 篇）")
-    parser.add_argument("--max-dcard-articles", type=int, default=60)
+    parser.add_argument("--max-dcard-articles", type=int, default=200)
+    parser.add_argument("--max-mobile01-articles", type=int, default=300)
     parser.add_argument("--max-threads-articles", type=int, default=200)
     parser.add_argument("--max-search-pages", type=int, default=10)
     parser.add_argument("--max-board-pages", type=int, default=30)
@@ -72,6 +73,7 @@ def main() -> None:
         max_articles=args.max_articles,
         max_dcard_articles=args.max_dcard_articles,
         max_threads_articles=args.max_threads_articles,
+        max_mobile01_articles=args.max_mobile01_articles,
         max_search_pages=args.max_search_pages,
         max_board_pages=args.max_board_pages,
         ptt_search_pages=args.ptt_search_pages,
