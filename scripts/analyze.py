@@ -14,6 +14,11 @@ from backend.app.services.analysis_runner import run_analysis
 
 
 def main() -> None:
+    if hasattr(sys.stdout, "reconfigure"):
+        try:
+            sys.stdout.reconfigure(encoding="utf-8")
+        except Exception:
+            pass
     result = run_analysis(save=True)
     report = result["report"]
     print(f"資料來源：{result['data_source']}")

@@ -10,11 +10,11 @@ from urllib.parse import quote
 
 from .config import CrawlConfig
 from .normalizer import is_relevant
-from .stealth import apply_stealth, stealth_launch_args
 
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_COOKIE_PATH = ROOT / "data" / "dcard_cookies.json"
 API_BASE = "https://www.dcard.tw/service/api/v2"
+DCARD_BASE = "https://www.dcard.tw"
 
 
 @dataclass
@@ -24,10 +24,11 @@ class DcardPostRef:
     forum_alias: str
     forum_name: str
     url: str
+    excerpt: str = ""
 
 
 class DcardBrowserSession:
-    """透過 Playwright 建立 Dcard session，並以 in-page fetch 呼叫官方 API。"""
+    """透過 Playwright 建立 Dcard session，優先 DOM 抓取，必要時才呼叫 API。"""
 
     def __init__(self, config: CrawlConfig):
         self.config = config
@@ -42,8 +43,8 @@ class DcardBrowserSession:
         from playwright.sync_api import sync_playwright
 
         self._playwright = sync_playwright().start()
-        # 實測：加上 stealth 參數／init script 反而會被 Cloudflare 判定為機器人而封鎖，
-        # 一般 Edge 瀏覽器則可正常瀏覽，因此預設不套用（dcard_stealth=False）
+        from .stealth import apply_stealth, stealth_launch_args
+
         use_stealth = getattr(self.config, "dcard_stealth", False)
         launch_kwargs: dict[str, Any] = {"headless": self.headless}
         if use_stealth:
@@ -90,14 +91,32 @@ class DcardBrowserSession:
             if self._playwright:
                 self._playwright.stop()
 
+    def _is_cloudflare(self, title: str) -> bool:
+        markers = ("請稍候", "Attention", "Just a moment", "Cloudflare", "驗證")
+        return any(m in title for m in markers)
+
     def _bootstrap_session(self) -> None:
         assert self.page is not None
-        self.page.goto("https://www.dcard.tw", timeout=90000, wait_until="domcontentloaded")
-        for _ in range(20):
+        self.page.goto(DCARD_BASE, timeout=90000, wait_until="domcontentloaded")
+        interactive = getattr(self.config, "dcard_capture_interactive", False)
+        max_wait = int(getattr(self.config, "dcard_cloudflare_wait_sec", 180))
+        waited = 0
+        while waited < max_wait:
             title = self.page.title()
-            if "請稍候" not in title and "Attention" not in title and "Just a moment" not in title:
+            if not self._is_cloudflare(title):
                 break
-            time.sleep(2)
+            if waited == 0:
+                print(
+                    "      [Dcard] 偵測到 Cloudflare 驗證。"
+                    + ("請在開啟的瀏覽器完成驗證…" if not self.headless else " headless 模式易被擋，請勿加 --dcard-headless")
+                )
+            time.sleep(3)
+            waited += 3
+        if self._is_cloudflare(self.page.title()) and not interactive:
+            raise RuntimeError(
+                "Cloudflare 驗證未通過。請改用互動模式："
+                "python scripts/capture_dcard.py --interactive"
+            )
         time.sleep(1)
 
     def fetch_json(self, url: str, retries: int = 3) -> Any:
@@ -126,6 +145,14 @@ class DcardCrawler:
     def __init__(self, config: CrawlConfig):
         self.config = config
         self.max_posts = getattr(config, "max_dcard_articles", max(15, config.max_articles // 3))
+        self.dom_first = getattr(config, "dcard_dom_first", True)
+        self.use_pttbrain = getattr(config, "dcard_use_pttbrain", True)
+        self.backend = getattr(config, "dcard_backend", "auto")
+
+    def _search_keywords(self) -> list[str]:
+        limit = getattr(self.config, "dcard_max_search_keywords", 8)
+        keywords = list(dict.fromkeys(self.config.dcard_search_keywords))
+        return keywords[:limit]
 
     def _parse_list(self, items: list[dict]) -> list[DcardPostRef]:
         refs: list[DcardPostRef] = []
@@ -141,7 +168,8 @@ class DcardCrawler:
                     title=title,
                     forum_alias=forum_alias,
                     forum_name=item.get("forumName") or forum_alias,
-                    url=f"https://www.dcard.tw/f/{forum_alias}/p/{post_id}",
+                    url=f"{DCARD_BASE}/f/{forum_alias}/p/{post_id}",
+                    excerpt=(item.get("excerpt") or item.get("content") or "")[:500],
                 )
             )
         return refs
@@ -155,15 +183,50 @@ class DcardCrawler:
             return self._parse_list(items)
         return []
 
-    def _search_page_refs(self, session: DcardBrowserSession, keyword: str) -> list[DcardPostRef]:
-        """從網站搜尋頁收集文章連結。
+    def _extract_search_dom(self, page) -> list[DcardPostRef]:
+        rows = page.evaluate(
+            """() => {
+                const out = [];
+                const seen = new Set();
+                for (const a of document.querySelectorAll('a[href*="/p/"]')) {
+                    const href = a.getAttribute('href') || '';
+                    const m = href.match(/\\/f\\/([^/]+)\\/p\\/(\\d+)/);
+                    if (!m || seen.has(m[2])) continue;
+                    seen.add(m[2]);
+                    const block = a.closest('article, li, div') || a;
+                    const text = (block.innerText || a.innerText || '').trim();
+                    const lines = text.split('\\n').map(s => s.trim()).filter(Boolean);
+                    const title = lines[0] || a.innerText.trim();
+                    const excerpt = lines.slice(1).join(' ');
+                    out.push({
+                        post_id: Number(m[2]),
+                        forum_alias: m[1],
+                        title,
+                        excerpt,
+                        url: href.startsWith('http') ? href : 'https://www.dcard.tw' + href,
+                    });
+                }
+                return out;
+            }"""
+        )
+        refs: list[DcardPostRef] = []
+        for row in rows:
+            refs.append(
+                DcardPostRef(
+                    post_id=int(row["post_id"]),
+                    title=row.get("title") or "",
+                    forum_alias=row.get("forum_alias") or "unknown",
+                    forum_name=row.get("forum_alias") or "unknown",
+                    url=row.get("url") or "",
+                    excerpt=row.get("excerpt") or "",
+                )
+            )
+        return refs
 
-        搜尋 API（/search/posts）實測會回傳與關鍵字無關的文章，網站搜尋頁的結果才準確；
-        這裡只取連結，標題與內文之後由 fetch_post 透過文章 API 取得。
-        """
+    def _search_page_refs(self, session: DcardBrowserSession, keyword: str) -> list[DcardPostRef]:
         page = session.page
         assert page is not None
-        page.goto(f"https://www.dcard.tw/search?query={quote(keyword)}", timeout=60000, wait_until="domcontentloaded")
+        page.goto(f"{DCARD_BASE}/search?query={quote(keyword)}", timeout=60000, wait_until="domcontentloaded")
         try:
             page.wait_for_selector('a[href*="/p/"]', timeout=20000)
         except Exception:
@@ -171,60 +234,125 @@ class DcardCrawler:
 
         found: dict[int, DcardPostRef] = {}
         for _ in range(self.config.dcard_search_scrolls + 1):
-            hrefs = page.eval_on_selector_all('a[href*="/p/"]', "els => els.map(e => e.getAttribute('href'))")
-            for href in hrefs:
-                m = re.match(r"^/f/([^/]+)/p/(\d+)", href or "")
-                if m and int(m.group(2)) not in found:
-                    alias, post_id = m.group(1), int(m.group(2))
-                    found[post_id] = DcardPostRef(
-                        post_id=post_id,
-                        title="",
-                        forum_alias=alias,
-                        forum_name=alias,
-                        url=f"https://www.dcard.tw/f/{alias}/p/{post_id}",
-                    )
+            for ref in self._extract_search_dom(page):
+                if ref.post_id not in found or (not found[ref.post_id].title and ref.title):
+                    found[ref.post_id] = ref
             page.mouse.wheel(0, 2400)
-            page.wait_for_timeout(1500)
+            page.wait_for_timeout(1200)
         return list(found.values())
+
+    def _scrape_post_dom(self, session: DcardBrowserSession, ref: DcardPostRef) -> tuple[str, str] | None:
+        page = session.page
+        assert page is not None
+        try:
+            page.goto(ref.url, timeout=45000, wait_until="domcontentloaded")
+            page.wait_for_timeout(800)
+            data = page.evaluate(
+                """() => {
+                    const title = document.querySelector('h1')?.innerText?.trim()
+                        || document.querySelector('[data-testid="post-title"]')?.innerText?.trim()
+                        || document.title;
+                    const selectors = [
+                        '[data-testid="post-content"]',
+                        'article',
+                        'main',
+                    ];
+                    let content = '';
+                    for (const sel of selectors) {
+                        const el = document.querySelector(sel);
+                        if (el && el.innerText && el.innerText.length > content.length) {
+                            content = el.innerText;
+                        }
+                    }
+                    return { title, content: (content || '').trim() };
+                }"""
+            )
+            title = (data.get("title") or ref.title or "").strip()
+            content = (data.get("content") or ref.excerpt or "").strip()
+            if len(content) < 15:
+                return None
+            return title, content[:4000]
+        except Exception:
+            return None
 
     def collect_refs(self, session: DcardBrowserSession) -> list[DcardPostRef]:
         refs: dict[int, DcardPostRef] = {}
 
-        # 搜尋結果不用標題篩選（標題常沒寫 Lexus），抓內文後 fetch_post 會再做全文篩選
-        for keyword in self.config.dcard_search_keywords:
+        for keyword in self._search_keywords():
             try:
                 for ref in self._search_page_refs(session, keyword):
                     refs.setdefault(ref.post_id, ref)
             except Exception as exc:
                 print(f"      [Dcard] 關鍵字「{keyword}」略過：{exc}")
-            time.sleep(max(self.config.request_delay_sec, 3.0))
+            time.sleep(max(self.config.request_delay_sec, 2.0))
 
-        for forum in self.config.dcard_forums:
-            before: int | None = None
-            for _ in range(self.config.dcard_forum_pages):
-                url = f"{API_BASE}/forums/{forum}/posts?popular=false&limit=30"
-                if before:
-                    url += f"&before={before}"
-                try:
-                    batch = self._fetch_list(session, url)
-                except Exception:
-                    break
-                if not batch:
-                    break
-                for ref in batch:
-                    if is_relevant(
-                        ref.title,
-                        self.config.relevance_keywords,
-                        self.config.service_keywords,
-                        aftersales_only=False,
-                    ):
-                        refs[ref.post_id] = ref
-                before = batch[-1].post_id
-                time.sleep(max(self.config.request_delay_sec, 2.5))
+        if len(refs) < self.max_posts // 2:
+            for forum in self.config.dcard_forums:
+                before: int | None = None
+                for _ in range(self.config.dcard_forum_pages):
+                    url = f"{API_BASE}/forums/{forum}/posts?popular=false&limit=30"
+                    if before:
+                        url += f"&before={before}"
+                    try:
+                        batch = self._fetch_list(session, url)
+                    except Exception:
+                        break
+                    if not batch:
+                        break
+                    for ref in batch:
+                        if is_relevant(
+                            ref.title,
+                            self.config.relevance_keywords,
+                            self.config.service_keywords,
+                            aftersales_only=False,
+                        ):
+                            refs[ref.post_id] = ref
+                    before = batch[-1].post_id
+                    time.sleep(max(self.config.request_delay_sec, 2.0))
 
         return list(refs.values())
 
+    def _build_post(self, ref: DcardPostRef, title: str, content: str, extra: dict | None = None) -> dict | None:
+        text = f"{title} {content}"
+        if not is_relevant(
+            text,
+            self.config.relevance_keywords,
+            self.config.service_keywords,
+            aftersales_only=self.config.aftersales_only,
+        ):
+            return None
+        extra = extra or {}
+        return {
+            "id": f"dcard_{ref.post_id}",
+            "source": "Dcard",
+            "board": extra.get("forumName") or ref.forum_name,
+            "title": title,
+            "content": content[:4000],
+            "posted_at": extra.get("createdAt"),
+            "url": ref.url,
+            "comment_count": extra.get("commentCount", 0),
+            "engagement": {
+                "likes": extra.get("likeCount", 0),
+                "comments": extra.get("commentCount", 0),
+            },
+        }
+
     def fetch_post(self, session: DcardBrowserSession, ref: DcardPostRef) -> dict | None:
+        title = ref.title
+        content = ref.excerpt
+
+        if self.dom_first:
+            scraped = self._scrape_post_dom(session, ref)
+            if scraped:
+                title, content = scraped
+                if len(content) >= 15:
+                    return self._build_post(ref, title, content)
+
+        if len((content or "").strip()) >= 40 and title:
+            post = self._build_post(ref, title, content)
+            if post:
+                return post
+
         try:
             data = session.fetch_json(f"{API_BASE}/posts/{ref.post_id}")
         except Exception:
@@ -236,48 +364,102 @@ class DcardCrawler:
             return None
 
         title = data.get("title") or ref.title
-        content = (data.get("content") or data.get("excerpt") or "").strip()
+        content = (data.get("content") or data.get("excerpt") or ref.excerpt or "").strip()
         if len(content) < 15:
             return None
+        return self._build_post(ref, title, content, extra=data)
 
-        text = f"{title} {content}"
-        if not is_relevant(
-            text,
-            self.config.relevance_keywords,
-            self.config.service_keywords,
-            aftersales_only=self.config.aftersales_only,
-        ):
-            return None
+    def _crawl_pttbrain(self) -> list[dict]:
+        from .dcard_pttbrain import PttBrainCrawler
 
-        return {
-            "id": f"dcard_{ref.post_id}",
-            "source": "Dcard",
-            "board": data.get("forumName") or ref.forum_name,
-            "title": title,
-            "content": content[:4000],
-            "posted_at": data.get("createdAt"),
-            "url": ref.url,
-            "comment_count": data.get("commentCount", 0),
-            "engagement": {
-                "likes": data.get("likeCount", 0),
-                "comments": data.get("commentCount", 0),
-            },
-        }
+        print("      [Dcard] 嘗試 PTT Brain 鏡像（免 Cloudflare）…")
+        posts = PttBrainCrawler(self.config).crawl()
+        print(f"      [Dcard/PTTBrain] 取得 {len(posts)} 篇")
+        return posts
+
+    def _crawl_direct_dom(self) -> list[dict]:
+        posts: list[dict] = []
+        seen_ids: set[str] = set()
+        with DcardBrowserSession(self.config) as session:
+            refs = self.collect_refs(session)
+            print(f"      [Dcard/DOM] 候選 {len(refs)} 篇，目標 {self.max_posts} 篇")
+            for ref in refs:
+                if len(posts) >= self.max_posts:
+                    break
+                post = self.fetch_post(session, ref)
+                if post and post["id"] not in seen_ids:
+                    seen_ids.add(post["id"])
+                    posts.append(post)
+                time.sleep(max(self.config.request_delay_sec, 0.8))
+        return posts
+
+    def _crawl_capture(self) -> list[dict]:
+        from .dcard_capture import DcardCaptureCrawler
+
+        interactive = getattr(self.config, "dcard_capture_interactive", False)
+        return DcardCaptureCrawler(self.config).crawl(interactive=interactive)
 
     def crawl(self) -> list[dict]:
         posts: list[dict] = []
-        try:
-            with DcardBrowserSession(self.config) as session:
-                refs = self.collect_refs(session)
-                print(f"      [Dcard] 候選文章 {len(refs)} 篇，最多抓取 {self.max_posts} 篇")
-                # 抓到 max_posts 篇通過篩選的文章才停，而非只抓前 N 個候選
-                for ref in refs:
+        seen: set[str] = set()
+
+        use_pttbrain = self.backend in ("auto", "pttbrain") and self.use_pttbrain
+        use_capture = self.backend in ("auto", "capture")
+        use_cdp_auto = self.backend in ("auto", "cdp") or getattr(self.config, "dcard_cdp_auto", False)
+        use_direct_dom = self.backend == "direct"
+
+        if use_pttbrain:
+            try:
+                for post in self._crawl_pttbrain():
+                    if post["id"] not in seen:
+                        seen.add(post["id"])
+                        posts.append(post)
+            except Exception as exc:
+                print(f"      [Dcard/PTTBrain] 跳過：{exc}")
+
+        if len(posts) < self.max_posts and use_cdp_auto:
+            try:
+                from .dcard_cdp import DcardCdpAutomator
+
+                print("      [Dcard] 自動模式：真實 Edge + CDP 攔截 API…")
+                for post in DcardCdpAutomator(self.config).crawl():
+                    if post["id"] in seen:
+                        continue
+                    seen.add(post["id"])
+                    posts.append(post)
                     if len(posts) >= self.max_posts:
                         break
-                    post = self.fetch_post(session, ref)
-                    if post:
-                        posts.append(post)
-                    time.sleep(self.config.request_delay_sec)
-        except Exception as exc:
-            raise RuntimeError(f"Dcard 爬蟲失敗（可能需使用可見瀏覽器通過 Cloudflare）：{exc}") from exc
-        return posts
+            except Exception as exc:
+                print(f"      [Dcard/Auto] 中止：{exc}")
+
+        if len(posts) < self.max_posts and use_capture and not use_cdp_auto:
+            try:
+                for post in self._crawl_capture():
+                    if post["id"] in seen:
+                        continue
+                    seen.add(post["id"])
+                    posts.append(post)
+                    if len(posts) >= self.max_posts:
+                        break
+            except Exception as exc:
+                if not posts:
+                    raise RuntimeError(
+                        f"Dcard 封包攔截失敗（可改 --dcard-auto 或 HAR 匯入）：{exc}"
+                    ) from exc
+                print(f"      [Dcard/Capture] 中止：{exc}")
+
+        if len(posts) < self.max_posts and use_direct_dom:
+            try:
+                for post in self._crawl_direct_dom():
+                    if post["id"] in seen:
+                        continue
+                    seen.add(post["id"])
+                    posts.append(post)
+                    if len(posts) >= self.max_posts:
+                        break
+            except Exception as exc:
+                if not posts:
+                    raise RuntimeError(f"Dcard DOM 爬蟲失敗：{exc}") from exc
+                print(f"      [Dcard/DOM] 中止：{exc}")
+
+        return posts[: self.max_posts]

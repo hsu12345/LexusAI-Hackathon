@@ -27,6 +27,11 @@ Desktop.ini
 
 # 爬蟲 session（含登入狀態，勿分享）
 data/dcard_cookies.json
+data/dcard_api_capture.json
+data/dcard_captured_posts.json
+data/dcard_export.har
+data/*.har
+data/dcard_edge_profile/
 data/threads_cookies.json
 data/*_cookies.json.bak
 

@@ -180,26 +180,26 @@ FLOW_NODES: list[FlowNode] = [
     ),
     FlowNode(
         id="retrieve",
-        label="Retrieve｜RAG 检索",
-        description="車主權益手冊 chunk → TF-IDF 检索最相關條文",
+        label="Retrieve｜手冊檢索",
+        description="從車主權益手冊切分條文，以 TF-IDF 找出最相關段落",
         layer="decision",
     ),
     FlowNode(
         id="generate",
         label="Generate｜AI 文案",
-        description="RAG 增強生成 LINE / App / Email / 專員腳本",
+        description="依手冊條文撰寫 LINE、App、Email、專員話術",
         layer="action",
     ),
     FlowNode(
         id="review",
         label="Review｜人工審核",
-        description="售後決策者審核文案與 KB 引用正確性",
+        description="售後人員確認文案與手冊引用是否正確",
         layer="decision",
     ),
     FlowNode(
         id="activate",
-        label="Activate｜通路推送",
-        description="依觸發條件推送至 CRM / LINE / App",
+        label="Activate｜通路發送",
+        description="依觸發條件經 CRM 或 LINE、App 等通路發送",
         layer="action",
     ),
     FlowNode(
@@ -211,22 +211,21 @@ FLOW_NODES: list[FlowNode] = [
 ]
 
 FLOW_MERMAID = """flowchart LR
-  subgraph data [資料層]
+  subgraph data ["資料層"]
     A[公開輿情監測]
     B[車主權益知識庫]
   end
-  subgraph analysis [分析層]
+  subgraph analysis ["分析層"]
     C[NLP 風險偵測]
-    D[Persona 分群]
+    D[車主樣態]
   end
-  subgraph action [行動層]
-    E[RAG 检索]
-    F[AI 文案生成]
+  subgraph action ["行動層"]
+    E[手冊檢索]
+    F[撰稿]
     G[人工審核]
-    H[通路推送]
+    H[通路發送]
   end
-  A --> C --> D
-  D --> E
+  A --> C --> D --> E
   B --> E
   E --> F --> G --> H
   H -->|KPI 回寫| C"""
@@ -245,8 +244,8 @@ def _build_insight_response(
             segment_avg_risk=0.0,
             segment_high_risk_count=0,
             rationale=(
-                f"產出 1 顯示「{persona.name}」占售後討論 {persona.share_pct}%，"
-                f"此計畫以「{persona.recommended_strategy[:24]}…」回應其痛點。"
+                f"輿情中「{persona.name}」約占售後相關討論 {persona.share_pct}%。"
+                f"建議溝通主軸：{persona.recommended_strategy[:36]}…"
             ),
         )
 
@@ -270,10 +269,10 @@ def _build_insight_response(
         segment_avg_risk=avg_risk,
         segment_high_risk_count=high_risk,
         rationale=(
-            f"產出 1 中，{len(segment)} 則討論歸屬「{persona.name}」（售後子集 {round(100 * len(segment) / aftersales_total, 1)}%），"
-            f"主要議題為「{topic_str}」，驅動因子含「{factor_str}」，"
-            f"其中 {high_risk} 則為高流失風險（平均風險 {avg_risk}）。"
-            f"本計畫以「{persona.recommended_strategy[:30]}…」直接回應上述洞察。"
+            f"約 {len(segment)} 則討論符合「{persona.name}」（占售後相關 {round(100 * len(segment) / aftersales_total, 1)}%），"
+            f"常見議題「{topic_str}」，多提到「{factor_str}」。"
+            f"其中 {high_risk} 則評為高流失風險，平均風險 {avg_risk}。"
+            f"溝通可著重：{persona.recommended_strategy[:36]}…"
         ),
     )
 
@@ -321,9 +320,9 @@ def _rag_contents(
         method = generated.get("generation_method", "rag")
         label = channel
         if method == "rag+llm":
-            label = f"{channel}（RAG + LLM）"
+            label = f"{channel}（手冊 + AI 改寫）"
         elif method == "rag":
-            label = f"{channel}（RAG 增強）"
+            label = f"{channel}（手冊引用）"
 
         contents.append(
             CommunicationContent(
@@ -358,14 +357,14 @@ def generate_plan(
     touch = [{"channel": t["name"], "purpose": t["use"]} for t in kb.get("touchpoints", [])]
 
     flow = [
-        {"step": "1. Listen", "desc": "監測 PTT／Dcard／Threads 公開討論並自動標籤"},
-        {"step": "2. Detect", "desc": "計算流失風險分數，標記高風險貼文與 Persona"},
-        {"step": "3. Match", "desc": "將風險因子對應 Persona，連結產出 1 洞察"},
-        {"step": "4. Retrieve", "desc": "RAG 从車主權益手冊检索相關條文（TF-IDF / Embedding）"},
-        {"step": "5. Generate", "desc": "AI 生成接觸點文案（RAG 增強，可選 LLM）"},
-        {"step": "6. Review", "desc": "售後決策者審核文案與 KB 引用"},
-        {"step": "7. Activate", "desc": "依觸發條件推送至 LINE／App／Email／專員"},
-        {"step": "8. Learn", "desc": "回收回廠率與互動數據，回寫模型權重"},
+        {"step": "1. 蒐集", "desc": "抓取 PTT、Dcard、Mobile01、Threads 公開討論"},
+        {"step": "2. 分析", "desc": "標記主題、情緒與流失風險"},
+        {"step": "3. 歸類", "desc": "對應四類車主樣態，銜接輿情摘要"},
+        {"step": "4. 檢索", "desc": "從車主權益手冊找出相關條文（TF-IDF）"},
+        {"step": "5. 撰稿", "desc": "產出各通路建議文案（可選 AI 改寫）"},
+        {"step": "6. 審核", "desc": "售後人員確認內容與引用是否正確"},
+        {"step": "7. 發送", "desc": "依規則觸發 LINE、App 等（CRM 串接為後續階段）"},
+        {"step": "8. 回饋", "desc": "以回廠率等指標調整規則"},
     ]
 
     contents = _rag_contents(

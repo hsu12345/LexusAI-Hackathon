@@ -39,6 +39,23 @@ def main() -> None:
     parser.add_argument("--skip-dcard", action="store_true", help="跳過 Dcard")
     parser.add_argument("--dcard-headless", action="store_true", help="Dcard 使用 headless（可能被 Cloudflare 擋）")
     parser.add_argument(
+        "--dcard-backend",
+        choices=["auto", "cdp", "capture", "pttbrain", "direct"],
+        default="auto",
+        help="Dcard：auto=CDP自動+鏡像、cdp=真實Edge自動、capture=Playwright、pttbrain、direct",
+    )
+    parser.add_argument("--dcard-auto", action="store_true", help="Dcard 使用真實 Edge CDP 全自動（推薦）")
+    parser.add_argument("--dcard-pttbrain-only", action="store_true", help="等同 --dcard-backend pttbrain")
+    parser.add_argument("--dcard-capture-only", action="store_true", help="等同 --dcard-backend capture（攔截 API 封包）")
+    parser.add_argument("--dcard-direct-only", action="store_true", help="等同 --dcard-backend direct（DOM 舊版）")
+    parser.add_argument("--dcard-pttbrain-pages", type=int, default=15, help="PTT Brain 每個論壇最多翻頁數")
+    parser.add_argument(
+        "--dcard-cloudflare-wait",
+        type=int,
+        default=180,
+        help="等待 Cloudflare 驗證秒數（可見瀏覽器時手動點選）",
+    )
+    parser.add_argument(
         "--threads-require-login",
         action="store_true",
         help="強制要求登入 Threads 才爬（預設免登入公開瀏覽即可；此選項用於 Threads 未來鎖回登入時的備援）",
@@ -68,6 +85,19 @@ def main() -> None:
     only_flags = [args.ptt_only, args.dcard_only, args.mobile01_only, args.threads_only]
     if sum(only_flags) > 1:
         parser.error("--ptt-only、--dcard-only、--mobile01-only、--threads-only 不可同時使用")
+    only_backends = [args.dcard_pttbrain_only, args.dcard_capture_only, args.dcard_direct_only]
+    if sum(only_backends) > 1:
+        parser.error("--dcard-pttbrain-only / --dcard-capture-only / --dcard-direct-only 不可同時使用")
+
+    dcard_backend = args.dcard_backend
+    if args.dcard_pttbrain_only:
+        dcard_backend = "pttbrain"
+    if args.dcard_capture_only:
+        dcard_backend = "capture"
+    if args.dcard_direct_only:
+        dcard_backend = "direct"
+    if args.dcard_auto:
+        dcard_backend = "cdp"
 
     config = CrawlConfig(
         max_articles=args.max_articles,
@@ -80,6 +110,11 @@ def main() -> None:
         request_delay_sec=args.delay,
         aftersales_only=args.aftersales_only,
         dcard_headless=args.dcard_headless,
+        dcard_backend=dcard_backend,
+        dcard_use_pttbrain=dcard_backend in ("auto", "pttbrain"),
+        dcard_capture_path="data/dcard_api_capture.json",
+        dcard_pttbrain_pages=args.dcard_pttbrain_pages,
+        dcard_cloudflare_wait_sec=args.dcard_cloudflare_wait,
         threads_headless=not args.threads_show_browser,
         threads_require_login=args.threads_require_login,
         proxy=args.proxy,

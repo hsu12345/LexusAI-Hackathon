@@ -78,9 +78,27 @@ class CrawlConfig:
     dcard_search_scrolls: int = 8
     # 每個 Dcard 看板往回翻的頁數（每頁 30 篇）
     dcard_forum_pages: int = 5
+    # auto=PTT Brain → 封包攔截；capture=只攔 API；pttbrain / direct(dom 舊版)
+    dcard_backend: str = "auto"
+    dcard_capture_path: str = "data/dcard_api_capture.json"
+    dcard_capture_interactive: bool = False
+    dcard_cdp_port: int = 9222
+    dcard_edge_profile: str = "data/dcard_edge_profile"
+    # 參考 https://github.com/enjuichang/Dcard-Crawler — 用 PTT Brain 鏡像避開 Cloudflare
+    dcard_use_pttbrain: bool = True
+    dcard_pttbrain_forums: list[str] = field(
+        default_factory=lambda: ["1ce3ebca-8701-42d5-b14c-076fc629bc8e"]
+    )
+    dcard_pttbrain_pages: int = 15
+    # 優先從搜尋頁／文章頁 DOM 抓內容，減少 API 429
+    dcard_dom_first: bool = True
+    # 限制搜尋關鍵字數量，避免每個詞都開一輪瀏覽器搜尋
+    dcard_max_search_keywords: int = 8
     dcard_headless: bool = False
     dcard_use_edge: bool = True
     dcard_cookie_path: str = "data/dcard_cookies.json"
+    # Cloudflare 驗證等待秒數（非 headless 時可手動點選）
+    dcard_cloudflare_wait_sec: int = 180
 
     # 未登入時 Threads 搜尋含空白的多詞查詢（如「lexus 保養」）會查無結果，只用單一詞；
     # 英文「lexus」多半回傳無關動態，中文「凌志」與車款型號命中率較高

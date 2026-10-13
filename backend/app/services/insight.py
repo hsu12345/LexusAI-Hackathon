@@ -18,8 +18,8 @@ from ..models import (
 PERSONA_TEMPLATES: list[dict] = [
     {
         "id": "price_switcher",
-        "name": "精算比價轉向者",
-        "tagline": "保證將屆／已過，以價格與 TCO 決定是否離開原廠",
+        "name": "保固比價型",
+        "tagline": "保固快到期，在意報價、總成本，考慮改外廠",
         "risk_level": RiskLevel.high,
         "demographics": {
             "車齡": "3–6 年／保證末期或剛過",
@@ -35,8 +35,8 @@ PERSONA_TEMPLATES: list[dict] = [
     },
     {
         "id": "time_friction",
-        "name": "時間敏感體驗者",
-        "tagline": "認同品牌服務，但被等待、缺料與行程摩擦推向外廠",
+        "name": "時間敏感型",
+        "tagline": "認同原廠，但等太久、缺料、代步不確定會想換地方",
         "risk_level": RiskLevel.medium,
         "demographics": {
             "車齡": "1–4 年",
@@ -52,8 +52,8 @@ PERSONA_TEMPLATES: list[dict] = [
     },
     {
         "id": "trust_seeker",
-        "name": "信任與專業守護者",
-        "tagline": "在意被理解與專業診斷，價格可接受但拒絕制式推銷",
+        "name": "信任修復型",
+        "tagline": "問題沒解決、說明不清楚，或覺得被推銷而卻步",
         "risk_level": RiskLevel.medium,
         "demographics": {
             "車齡": "2–5 年",
@@ -69,8 +69,8 @@ PERSONA_TEMPLATES: list[dict] = [
     },
     {
         "id": "loyalty_advocate",
-        "name": "尊榮體驗擁護者",
-        "tagline": "高度認同取送車、救援與服務氛圍，是口碑擴散核心",
+        "name": "滿意擁護型",
+        "tagline": "對服務有感，願意回廠，也會在網路上分享好經驗",
         "risk_level": RiskLevel.low,
         "demographics": {
             "車齡": "新車～3 年為主",
@@ -238,8 +238,8 @@ def _executive_summary(posts: list[AnalyzedPost], personas: list[PersonaProfile]
         f"整體高流失風險占 {round(100 * high / max(len(posts), 1), 1)}%，"
         f"售後子集高風險 {aftersales_high} 則、平均風險 {aftersales.avg_churn_risk}。"
         f"售後輿情最熱議題為「{topic_name}」，"
-        f"最大 Persona 為「{top_persona.name}」（{top_persona.share_pct}%）。"
-        f"建議優先針對高風險售後討論設計攔截溝通，並強化原廠價值與便利服務的差異化訊息。"
+        f"討論量最多的是「{top_persona.name}」這類車主（約 {top_persona.share_pct}%）。"
+        f"可先從高風險售後議題著手規劃關懷與說明，凸顯原廠保固與服務便利。"
     )
 
 
@@ -306,8 +306,8 @@ def build_market_report(posts: list[AnalyzedPost]) -> MarketInsightReport:
             "否定詞與程度副詞修飾的情緒分析（非單純詞頻計分）",
             "售後服務相關度模型：品牌 × 保修關鍵字 − 購車雜訊懲罰",
             "流失風險：規則因子 + 情緒 + 互動熱度 + 動態分位數分級（P70/P90）",
-            "Persona：多特徵加權匹配（主題、風險因子、情緒、售後相關度）",
-            "知識庫增強生成（RAG）：車主權益手冊 → 溝通文案",
+            "車主樣態：依主題、風險因子、情緒與售後相關度加權歸類",
+            "手冊引用撰稿：依車主權益手冊條文產出各通路建議文案",
         ],
         executive_summary=_executive_summary(posts, personas, aftersales),
     )
